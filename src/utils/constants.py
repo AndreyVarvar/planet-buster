@@ -7,3 +7,8 @@ FPS = 100
 
 # colors
 BLACK = (13, 0, 26)
+
+
+MAIN_MENU = 'main menu'
+SETTINGS = 'settings'
+MAIN_GAME = 'game'
