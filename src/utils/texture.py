@@ -9,7 +9,7 @@ class Texture(Thingy):
 
 class Animation(Thingy):
     def __init__(self, position, spritesheet_path, frame_dimensions, fps=10):
-        self.generate_animation(spritesheet_path, frame_dimensions)
+        self.generate_animation(pg.image.load(spritesheet_path), frame_dimensions)
 
         super().__init__(position, self.animation[0])
 
@@ -20,9 +20,9 @@ class Animation(Thingy):
         self.time_between_frame_change = 1/fps
 
     def update(self, dt):
-        self.time_between_frame_change += dt
-        while self.time_between_frame_change >= self.time_between_frame_change:
-            self.time_between_frame_change -= self.time_between_frame_change
+        self.time_since_last_frame_change += dt
+        while self.time_since_last_frame_change >= self.time_between_frame_change:
+            self.time_since_last_frame_change -= self.time_between_frame_change
             self.frame_idx += 1
 
         while self.frame_idx >= self.frame_count:
@@ -34,4 +34,5 @@ class Animation(Thingy):
         self.animation = []
 
         for i in range(spritesheet.size[0]//frame_dimensions[0]):
-            self.animation.append(spritesheet.subsurface(pg.Rect(frame_dimensions[0]*i, 0, frame_dimensions[0], frame_dimensions[1])))
+            subsurface = spritesheet.subsurface(pg.Rect(frame_dimensions[0]*i, 0, frame_dimensions[0], frame_dimensions[1]))
+            self.animation.append(subsurface)

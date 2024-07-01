@@ -1,5 +1,7 @@
 import pygame as pg
 
+WIDTH, HEIGHT = 1000, 600
+
 BLANK = pg.Surface((1, 1))
 BLANK.fill((128, 128, 128, 128))
 
