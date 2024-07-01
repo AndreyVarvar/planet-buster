@@ -17,6 +17,8 @@ class Player(Animation):
 
         self.spawn_laser = False
 
+        self.angular_velocity = 180  # degrees per sec
+
         self.laser_cooldown = 0
         self.cd = 0.2
 
@@ -30,11 +32,11 @@ class Player(Animation):
         super().update(dt)
 
         # updating the rotation
-        vector_from_player_to_mouse = pg.Vector2(mouse_pos[0] + scroll[0] - WIDTH // 2 - self.position.x, mouse_pos[1] + scroll[1] - HEIGHT // 2 - self.position.y)
+        if keys_pressed[pg.K_LEFT] or keys_pressed[pg.K_a]:
+            self.rotation += self.angular_velocity * dt
 
-        self.rotation = 180 / pi * atan2(-vector_from_player_to_mouse.y, vector_from_player_to_mouse.x)
-        if self.rotation < 0:
-            self.rotation += 2 * pi
+        if keys_pressed[pg.K_RIGHT] or keys_pressed[pg.K_d]:
+            self.rotation -= self.angular_velocity * dt
 
 
         # updating the position

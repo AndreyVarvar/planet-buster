@@ -2,7 +2,7 @@ from src.utils.scene_manager import scene_manager
 from src.utils.scene import Scene
 from src.utils.constants import *
 from src.utils.texture import Texture, Animation
-from math import atan2, pi, cos, sin, radians
+from math import atan2, degrees
 from src.utils.player import Player
 from src.utils.laser import Projectile
 # here lies the massive scene that is out game
@@ -19,7 +19,7 @@ class MainGame(Scene):
         scroll = args[2]
         surf.fill(BLACK)
 
-        self.sun.draw(surf, scroll, scale=10)
+        self.sun.draw(surf, scroll, scale=5)
 
         for projectile in self.projectiles:
             projectile.draw(surf, scroll)
@@ -43,7 +43,7 @@ class MainGame(Scene):
                 self.projectiles.remove(projectile)
 
         if self.player.spawn_laser:
-            self.projectiles.append(Projectile(self.player.position, 0, 1000, 100, self.player.rotation))
+            self.projectiles.append(Projectile(self.player.position, 0, 1000, 100, degrees(atan2(self.player.position.y-mouse_pos[1]-scroll[1]+HEIGHT//2, -self.player.position.x+mouse_pos[0]+scroll[0]-WIDTH//2))))
 
     def scene_thingies_init(self, *args):
         self.sun = Animation((0, 0), 'assets/textures/spritesheets/HERECOMESTHESUN.png', (200, 200), 5)
