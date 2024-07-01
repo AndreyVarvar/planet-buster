@@ -47,7 +47,7 @@ class Game:
         pg.display.update()
 
     def update(self):
-        self.scene_manager.update(pg.mouse.get_pos(), self.cursor, self.dt, self.scroll)
+        self.scene_manager.update(pg.mouse.get_pos(), self.cursor, self.dt, self.scroll, pg.key.get_pressed())
 
         self.cursor.update(pg.mouse.get_pressed())
 

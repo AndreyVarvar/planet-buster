@@ -5,7 +5,7 @@ from src.utils.constants import WIDTH, HEIGHT
 
 class Thingy:
     def __init__(self, position=pg.Vector2(0, 0), texture=pg.Surface((10, 10))):
-        self.position = position
+        self.position = pg.Vector2(position)
         self.texture = texture
 
     def draw(self, surf, scroll, rotation=0, scale=1):
