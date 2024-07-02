@@ -8,8 +8,8 @@ class Texture(Thingy):
 
 
 class Animation(Thingy):
-    def __init__(self, position, spritesheet_path, frame_dimensions, fps=10):
-        self.generate_animation(pg.image.load(spritesheet_path), frame_dimensions)
+    def __init__(self, position, spritesheet_path, frame_dimensions, fps=10, scale=1):
+        self.generate_animation(pg.image.load(spritesheet_path), frame_dimensions, scale)
 
         super().__init__(position, self.animation[0])
 
@@ -30,9 +30,9 @@ class Animation(Thingy):
 
         self.texture = self.animation[self.frame_idx]
 
-    def generate_animation(self, spritesheet: pg.Surface, frame_dimensions):
+    def generate_animation(self, spritesheet: pg.Surface, frame_dimensions, scale):
         self.animation = []
 
         for i in range(spritesheet.size[0]//frame_dimensions[0]):
             subsurface = spritesheet.subsurface(pg.Rect(frame_dimensions[0]*i, 0, frame_dimensions[0], frame_dimensions[1]))
-            self.animation.append(subsurface)
+            self.animation.append(pg.transform.scale_by(subsurface, scale))

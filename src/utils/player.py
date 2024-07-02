@@ -46,7 +46,7 @@ class Player(Animation):
 
             self.velocity = self.velocity.clamp_magnitude(self.max_speed)
 
-        if keys_pressed[pg.K_DOWN] or keys_pressed[pg.K_s]:
+        if keys_pressed[pg.K_DOWN] or keys_pressed[pg.K_s] or keys_pressed[pg.K_SPACE] or keys_pressed[pg.KMOD_SHIFT]:
             self.velocity /= 1.1
 
 
