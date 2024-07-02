@@ -16,6 +16,10 @@ class MainGame(Scene):
 
         self.projectiles = []
 
+        self.map_boundaries = pg.Rect(-10_000, -10_000, 20_000, 20_000)
+
+        self.game_end = False
+
     def draw_scene(self, *args):
         surf = args[0]
         scroll = args[2]
@@ -50,7 +54,7 @@ class MainGame(Scene):
                 planet.apply_gravity(enemy, dt)
 
         # update the player
-        self.player.update(dt, mouse_pos, scroll, keys_pressed, cursor)
+        self.player.update(dt, mouse_pos, scroll, keys_pressed, cursor, self.map_boundaries)
 
         # update projectiles
         for projectile in self.projectiles.copy():
@@ -60,23 +64,25 @@ class MainGame(Scene):
                 self.projectiles.remove(projectile)
 
         # update enemies
-        for enemy in self.enemies:
-            enemy.update(dt, self.player.position)
+        for enemy in self.enemies.copy():
+            enemy.update(dt, self.player.position, self.map_boundaries)
 
             if enemy.spawn_laser:  # spawn lasers
                 self.projectiles.append(Projectile(enemy.position, 2, 1000, 20, 180+degrees(atan2(-enemy.position.y+self.player.position.y, enemy.position.x-self.player.position.x))))
 
+            if enemy.really_dead_and_should_be_destroyed:
+                self.enemies.remove(enemy)
         # spawn lasers
         if self.player.spawn_laser:
             self.projectiles.append(Projectile(self.player.position, 0, 1000, 100, degrees(atan2(self.player.position.y-mouse_pos[1]-scroll[1]+HEIGHT//2, -self.player.position.x+mouse_pos[0]+scroll[0]-WIDTH//2))))
 
     def scene_thingies_init(self, *args):
         self.planets = []
-        self.planets.append(CelestialBody((0, 0), 'sun', 0))
-        self.planets.append(CelestialBody((1000, 1000), 'planet', 0))
-        self.planets.append(CelestialBody((0, 1000), 'planet', 1))
-        self.planets.append(CelestialBody((-1000, 1000), 'planet', 2))
-        self.planets.append(CelestialBody((1000, 0), 'planet', 3))
+        self.planets.append(CelestialBody((0, 0), 'sun', -1))
+        self.planets.append(CelestialBody((1000, 1000), 'planet', -1))
+        self.planets.append(CelestialBody((0, 1000), 'planet', -1))
+        self.planets.append(CelestialBody((-1000, 1000), 'planet', -1))
+        self.planets.append(CelestialBody((1000, 0), 'planet', -1))
 
 
         self.player = Player((300, 0))

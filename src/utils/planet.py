@@ -52,7 +52,9 @@ class CelestialBody(Animation):
 
         scale = random.randint(scales[type][0], scales[type][1])/10
 
-        super().__init__(position, paths[type][i], frame_dimensions[type], fps[type], scale)
+        path = paths[type][i] if i != -1 else random.choice(paths[type])
+
+        super().__init__(position, path, frame_dimensions[type], fps[type], scale)
 
         self.mass = (scale*100)**3/100
 
@@ -82,5 +84,4 @@ class CelestialBody(Animation):
             other_object.velocity.y -= force*sin(radians(angle))
 
             if distance < (other_object.hitbox_radius + self.radius):
-                other_object.position.x = self.position.x - (self.radius+other_object.hitbox_radius)*cos(radians(angle))  # for now
-                other_object.position.y = self.position.y + (self.radius+other_object.hitbox_radius)*sin(radians(angle))
+                other_object.dead = True

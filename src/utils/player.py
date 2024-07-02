@@ -15,6 +15,10 @@ class Player(Animation):
         self.acceleration = 10
         self.max_speed = 20
 
+        self.dead = False
+        self.playing_animation = False
+        self.really_dead = False
+
         self.spawn_laser = False
 
         self.angular_velocity = 180  # degrees per sec
@@ -31,40 +35,51 @@ class Player(Animation):
 
         super().update(dt)
 
-        # updating the rotation
-        if keys_pressed[pg.K_LEFT] or keys_pressed[pg.K_a]:
-            self.rotation += self.angular_velocity * dt
+        if not self.dead:
 
-        if keys_pressed[pg.K_RIGHT] or keys_pressed[pg.K_d]:
-            self.rotation -= self.angular_velocity * dt
+            # updating the rotation
+            if keys_pressed[pg.K_LEFT] or keys_pressed[pg.K_a]:
+                self.rotation += self.angular_velocity * dt
 
-
-        # updating the position
-        if (keys_pressed[pg.K_UP] or keys_pressed[pg.K_w]) and self.velocity.magnitude() < self.max_speed//2:
-            self.velocity.x += cos(radians(self.rotation))*self.acceleration * dt
-            self.velocity.y -= sin(radians(self.rotation))*self.acceleration * dt
+            if keys_pressed[pg.K_RIGHT] or keys_pressed[pg.K_d]:
+                self.rotation -= self.angular_velocity * dt
 
 
-        if keys_pressed[pg.K_DOWN] or keys_pressed[pg.K_s] or keys_pressed[pg.K_SPACE] or keys_pressed[pg.KMOD_SHIFT]:
-            self.velocity /= 1.1
-
-        self.velocity = self.velocity.clamp_magnitude(self.max_speed)
-
-        self.position[0] += self.velocity.x
-        self.position[1] += self.velocity.y
-
-        new_scroll = self.position.lerp(pg.Vector2(scroll)+pg.Vector2(mouse_pos)-pg.Vector2(WIDTH//2, HEIGHT//2), 0.2)
-        scroll[0] = new_scroll[0]
-        scroll[1] = new_scroll[1]
+            # updating the position
+            if (keys_pressed[pg.K_UP] or keys_pressed[pg.K_w]) and self.velocity.magnitude() < self.max_speed//2:
+                self.velocity.x += cos(radians(self.rotation))*self.acceleration * dt
+                self.velocity.y -= sin(radians(self.rotation))*self.acceleration * dt
 
 
-        # spawning lasers
-        if cursor.holding and self.laser_cooldown < 0:
-            self.spawn_laser = True
-            self.laser_cooldown = self.cd
+            if keys_pressed[pg.K_DOWN] or keys_pressed[pg.K_s] or keys_pressed[pg.K_SPACE] or keys_pressed[pg.KMOD_SHIFT]:
+                self.velocity /= 1.1
+
+            self.velocity = self.velocity.clamp_magnitude(self.max_speed)
+
+            self.position[0] += self.velocity.x
+            self.position[1] += self.velocity.y
+
+            new_scroll = self.position.lerp(pg.Vector2(scroll)+pg.Vector2(mouse_pos)-pg.Vector2(WIDTH//2, HEIGHT//2), 0.2)
+            scroll[0] = new_scroll[0]
+            scroll[1] = new_scroll[1]
+
+
+            # spawning lasers
+            if cursor.holding and self.laser_cooldown < 0:
+                self.spawn_laser = True
+                self.laser_cooldown = self.cd
+            else:
+                self.spawn_laser = False
+                self.laser_cooldown -= dt
         else:
-            self.spawn_laser = False
-            self.laser_cooldown -= dt
+            if not self.playing_animation:
+                self.playing_animation = True
+                self.rotation = 90
+                super().__init__(self.position, 'assets/textures/spritesheets/explosion.png', (96, 96), 1, 1)
+
+            if self.animation_end:
+                self.really_dead = True
+
 
     def draw(self, *args):
         surf = args[0]

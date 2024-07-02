@@ -19,14 +19,18 @@ class Animation(Thingy):
         self.time_since_last_frame_change = 0
         self.time_between_frame_change = 1/fps
 
+        self.animation_end = False
+
     def update(self, dt):
         self.time_since_last_frame_change += dt
         while self.time_since_last_frame_change >= self.time_between_frame_change:
             self.time_since_last_frame_change -= self.time_between_frame_change
             self.frame_idx += 1
 
+        self.animation_end = False
         while self.frame_idx >= self.frame_count:
             self.frame_idx -= self.frame_count
+            self.animation_end = True
 
         self.texture = self.animation[self.frame_idx]
 
