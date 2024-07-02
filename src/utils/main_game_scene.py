@@ -6,6 +6,7 @@ from math import atan2, degrees
 from src.utils.player import Player
 from src.utils.laser import Projectile
 from src.utils.enemy import Enemy
+from src.utils.planet import CelestialBody
 # here lies the massive scene that is out game
 
 
@@ -38,32 +39,44 @@ class MainGame(Scene):
         scroll = args[3]
         keys_pressed = args[4]
 
+        # update every planet
         for planet in self.planets:
             planet.update(dt)
 
+            # as well as apply gravity
+            planet.apply_gravity(self.player, dt)
+
+            for enemy in self.enemies:
+                planet.apply_gravity(enemy, dt)
+
+        # update the player
         self.player.update(dt, mouse_pos, scroll, keys_pressed, cursor)
 
+        # update projectiles
         for projectile in self.projectiles.copy():
             projectile.update(dt)
 
             if projectile.self_destruct:
                 self.projectiles.remove(projectile)
 
+        # update enemies
         for enemy in self.enemies:
             enemy.update(dt, self.player.position)
 
-            if enemy.spawn_laser:
+            if enemy.spawn_laser:  # spawn lasers
                 self.projectiles.append(Projectile(enemy.position, 2, 1000, 20, 180+degrees(atan2(-enemy.position.y+self.player.position.y, enemy.position.x-self.player.position.x))))
 
+        # spawn lasers
         if self.player.spawn_laser:
             self.projectiles.append(Projectile(self.player.position, 0, 1000, 100, degrees(atan2(self.player.position.y-mouse_pos[1]-scroll[1]+HEIGHT//2, -self.player.position.x+mouse_pos[0]+scroll[0]-WIDTH//2))))
 
     def scene_thingies_init(self, *args):
         self.planets = []
-        self.planets.append(Animation((0, 0), 'assets/textures/spritesheets/HERECOMESTHESUN.png', (200, 200), 5, scale=5))
-        self.planets.append(Animation((1000, 1000), 'assets/textures/spritesheets/planet1.png', (100, 100), 5, scale=1))
-        self.planets.append(Animation((-1000, 0), 'assets/textures/spritesheets/planet2.png', (100, 100), 5, scale=2.2))
-        self.planets.append(Animation((200, -1000), 'assets/textures/spritesheets/planet3.png', (100, 100), 5, scale=1.5))
+        self.planets.append(CelestialBody((0, 0), 'sun', 0))
+        self.planets.append(CelestialBody((1000, 1000), 'planet', 0))
+        self.planets.append(CelestialBody((0, 1000), 'planet', 1))
+        self.planets.append(CelestialBody((-1000, 1000), 'planet', 2))
+        self.planets.append(CelestialBody((1000, 0), 'planet', 3))
 
 
         self.player = Player((300, 0))

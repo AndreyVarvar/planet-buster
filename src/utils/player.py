@@ -8,12 +8,12 @@ class Player(Animation):
     def __init__(self, position):
         super().__init__(position, 'assets/textures/spritesheets/spaceship.png', (32, 32), 2)
 
-        self.hitbox = pg.Rect(position, (50, 50))
+        self.hitbox_radius = 25
         self.rotation = 0
 
         self.velocity = pg.Vector2()
         self.acceleration = 10
-        self.max_speed = 7
+        self.max_speed = 20
 
         self.spawn_laser = False
 
@@ -40,15 +40,15 @@ class Player(Animation):
 
 
         # updating the position
-        if keys_pressed[pg.K_UP] or keys_pressed[pg.K_w]:
+        if (keys_pressed[pg.K_UP] or keys_pressed[pg.K_w]) and self.velocity.magnitude() < self.max_speed//2:
             self.velocity.x += cos(radians(self.rotation))*self.acceleration * dt
             self.velocity.y -= sin(radians(self.rotation))*self.acceleration * dt
 
-            self.velocity = self.velocity.clamp_magnitude(self.max_speed)
 
         if keys_pressed[pg.K_DOWN] or keys_pressed[pg.K_s] or keys_pressed[pg.K_SPACE] or keys_pressed[pg.KMOD_SHIFT]:
             self.velocity /= 1.1
 
+        self.velocity = self.velocity.clamp_magnitude(self.max_speed)
 
         self.position[0] += self.velocity.x
         self.position[1] += self.velocity.y

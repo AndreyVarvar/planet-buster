@@ -10,12 +10,12 @@ class Enemy(Animation):
     def __init__(self, position):
         super().__init__(position, 'assets/textures/spritesheets/enemy-spaceship.png', (32, 32), 2)
 
-        self.hitbox = pg.Rect(position, (50, 50))
+        self.hitbox_radius = 50
         self.rotation = 0
 
         self.velocity = pg.Vector2()
         self.acceleration = 10
-        self.max_speed = 7
+        self.max_speed = 20
 
         self.spawn_laser = False
 
@@ -56,15 +56,14 @@ class Enemy(Animation):
         if distance_to_player < 400:
             self.in_pursuit = True
 
-        if distance_to_player > 300 and self.in_pursuit:
+        if (distance_to_player > 300 and self.in_pursuit) and self.velocity.magnitude() < self.max_speed//2:
             rotation = random.randint(-100, 100) + self.rotation
             self.velocity.x += cos(radians(rotation)) * self.acceleration * dt
             self.velocity.y -= sin(radians(rotation)) * self.acceleration * dt
-
-            self.velocity = self.velocity.clamp_magnitude(self.max_speed)
         else:
             self.velocity /= 1.1
 
+        self.velocity = self.velocity.clamp_magnitude(self.max_speed)
 
         self.position[0] += self.velocity.x
         self.position[1] += self.velocity.y
