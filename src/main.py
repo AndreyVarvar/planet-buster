@@ -1,21 +1,18 @@
-import pygame as pg
-pg.init()
-
-from src.utils.scene_manager import scene_manager  # crazy namings
 from src.utils.constants import *
+from src.utils.scene_manager import scene_manager  # crazy namings
 
 from src.utils.cursor import Cursor
 
-import src.utils.scenes, src.utils.main_game_scene  # aren't supposed to be used in here, since they are added to scene_manager automatically
+import src.utils.scenes, src.utils.main_game_scene  # aren't supposed to be used in here, but need to be 'called'
 
 
 class Game:
-    def __init__(self, display_size):
-        self.display_size = display_size
-        self.display = pg.display.set_mode(display_size)
+    def __init__(self, display):
+        self.display = display
         self.running = True
 
         self.scene_manager = scene_manager
+
         self.scene_manager.current_scene = scene_manager.scenes['main menu']
 
         self.scroll = [0, 0]
@@ -50,4 +47,7 @@ class Game:
         self.scene_manager.update(pg.mouse.get_pos(), self.cursor, self.dt, self.scroll, pg.key.get_pressed())
 
         self.cursor.update(pg.mouse.get_pressed())
+
+        if self.scene_manager.leaving:
+            self.running = False
 

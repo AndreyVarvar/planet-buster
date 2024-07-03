@@ -11,14 +11,12 @@ from src.utils.planet import CelestialBody
 
 
 class MainGame(Scene):
-    def __init__(self, scene_manager):
-        super().__init__(MAIN_GAME, scene_manager)
-
-        self.projectiles = []
-
+    def __init__(self):
         self.map_boundaries = pg.Rect(-10_000, -10_000, 20_000, 20_000)
 
-        self.game_end = False
+        self.time = 0
+
+        self.reset()
 
     def draw_scene(self, *args):
         surf = args[0]
@@ -26,15 +24,15 @@ class MainGame(Scene):
         surf.fill(BLACK)
 
         for planet in self.planets:
-            planet.draw(surf, scroll)
+            planet.draw(surf, scroll, self.time)
 
         for projectile in self.projectiles:
             projectile.draw(surf, scroll)
 
         for enemy in self.enemies:
-            enemy.draw(surf, scroll)
+            enemy.draw(surf, scroll, self.time)
 
-        self.player.draw(surf, scroll)
+        self.player.draw(surf, scroll, self.time)
 
     def update(self, *args):
         mouse_pos = args[0]
@@ -42,6 +40,8 @@ class MainGame(Scene):
         dt = args[2]
         scroll = args[3]
         keys_pressed = args[4]
+
+        self.time += dt
 
         # update every planet
         for planet in self.planets:
@@ -65,7 +65,7 @@ class MainGame(Scene):
 
         # update enemies
         for enemy in self.enemies.copy():
-            enemy.update(dt, self.player.position, self.map_boundaries)
+            enemy.update(dt, self.player.position, self.map_boundaries, scroll)
 
             if enemy.spawn_laser:  # spawn lasers
                 self.projectiles.append(Projectile(enemy.position, 2, 1000, 20, 180+degrees(atan2(-enemy.position.y+self.player.position.y, enemy.position.x-self.player.position.x))))
@@ -76,6 +76,11 @@ class MainGame(Scene):
         if self.player.spawn_laser:
             self.projectiles.append(Projectile(self.player.position, 0, 1000, 100, degrees(atan2(self.player.position.y-mouse_pos[1]-scroll[1]+HEIGHT//2, -self.player.position.x+mouse_pos[0]+scroll[0]-WIDTH//2))))
 
+        # end game when player dies
+        if self.player.really_dead:
+            self.change_scene = True
+            self.change_to = MAIN_MENU
+
     def scene_thingies_init(self, *args):
         self.planets = []
         self.planets.append(CelestialBody((0, 0), 'sun', -1))
@@ -85,9 +90,16 @@ class MainGame(Scene):
         self.planets.append(CelestialBody((1000, 0), 'planet', -1))
 
 
-        self.player = Player((300, 0))
+        self.player = Player((400, 0))
 
-        self.enemies = [Enemy((-100, -100)), Enemy((-100, 100)), Enemy((-100, 0))]
+        self.enemies = [Enemy((-100, -1000)), Enemy((0, -1000)), Enemy((100, -1000)), Enemy((-100, -1100)), Enemy((0, -1100)), Enemy((100, -1100))]
+
+    def reset(self, *args):
+        super().__init__(MAIN_GAME, scene_manager)
+
+        self.projectiles = []
+
+        self.game_end = False
 
 
-MainGame(scene_manager)
+MainGame()

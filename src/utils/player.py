@@ -1,7 +1,8 @@
 from src.utils.texture import Animation
 import pygame as pg
-from math import pi, atan2, sin, cos, radians
-from src.utils.constants import WIDTH, HEIGHT
+from math import sin, cos, radians, floor
+from src.utils.constants import *
+import random
 
 
 class Player(Animation):
@@ -32,6 +33,7 @@ class Player(Animation):
         scroll = args[2]
         keys_pressed = args[3]
         cursor = args[4]
+        map_boundaries = args[5]
 
         super().update(dt)
 
@@ -60,8 +62,8 @@ class Player(Animation):
             self.position[1] += self.velocity.y
 
             new_scroll = self.position.lerp(pg.Vector2(scroll)+pg.Vector2(mouse_pos)-pg.Vector2(WIDTH//2, HEIGHT//2), 0.2)
-            scroll[0] = new_scroll[0]
-            scroll[1] = new_scroll[1]
+            scroll[0] = (new_scroll[0]+scroll[0])/2
+            scroll[1] = (new_scroll[1]+scroll[1])/2
 
 
             # spawning lasers
@@ -71,11 +73,50 @@ class Player(Animation):
             else:
                 self.spawn_laser = False
                 self.laser_cooldown -= dt
+
+
+            # make sure we don't leave out of bounds
+            if (self.position.x - self.hitbox_radius) < map_boundaries.left:
+                self.velocity.x = 0
+                self.position.x = map_boundaries.left + self.hitbox_radius
+            elif (self.position.x + self.hitbox_radius) > map_boundaries.right:
+                self.velocity.x = 0
+                self.position.x = map_boundaries.right - self.hitbox_radius
+
+            if (self.position.y - self.hitbox_radius) < map_boundaries.top:
+                self.velocity.y = 0
+                self.position.y = map_boundaries.top + self.hitbox_radius
+            elif (self.position.y + self.hitbox_radius) > map_boundaries.bottom:
+                self.velocity.y = 0
+                self.position.y = map_boundaries.bottom - self.hitbox_radius
+
+
+            # make sure scroll also doesn't go out of bounds:
+            if (scroll[1]-HEIGHT//2) < map_boundaries.top:
+                scroll[1] = map_boundaries.top + HEIGHT//2
+            elif (scroll[1]+HEIGHT//2) > map_boundaries.bottom:
+                scroll[1] = map_boundaries.bottom - HEIGHT//2
+
+            if (scroll[0]-WIDTH//2) < map_boundaries.left:
+                scroll[0] = map_boundaries.left + WIDTH//2
+            elif (scroll[0]+WIDTH//2) > map_boundaries.right:
+                scroll[0] = map_boundaries.right - WIDTH//2
         else:
             if not self.playing_animation:
+                scroll[0] += random.randint(-100, 100)
+                scroll[1] += random.randint(-100, 100)
+
+                random.choice(explosion).play()
+
                 self.playing_animation = True
                 self.rotation = 90
-                super().__init__(self.position, 'assets/textures/spritesheets/explosion.png', (96, 96), 1, 1)
+                super().__init__(self.position, 'assets/textures/spritesheets/explosion.png', (96, 96), 5, 1)
+
+            scroll[0] += (-scroll[0]+self.position.x)/20
+            scroll[1] += (-scroll[1]+self.position.y)/20
+
+            scroll[0] = floor(scroll[0])
+            scroll[1] = floor(scroll[1])
 
             if self.animation_end:
                 self.really_dead = True
@@ -84,4 +125,5 @@ class Player(Animation):
     def draw(self, *args):
         surf = args[0]
         scroll = args[1]
-        super().draw(surf, scroll, self.rotation-90, 2)
+        time = args[2]
+        super().draw(surf, scroll, self.rotation-90, 2, angle=time, strength=2)

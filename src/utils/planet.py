@@ -69,8 +69,9 @@ class CelestialBody(Animation):
     def draw(self, *args):
         surf = args[0]
         scroll = args[1]
+        time = args[2]
 
-        super().draw(surf, scroll)
+        super().draw(surf, scroll, angle=time, strength=1)
 
     def apply_gravity(self, other_object, dt):
         distance = sqrt((other_object.position.x-self.position.x)**2 + (other_object.position.y-self.position.y)**2)
@@ -84,4 +85,8 @@ class CelestialBody(Animation):
             other_object.velocity.y -= force*sin(radians(angle))
 
             if distance < (other_object.hitbox_radius + self.radius):
-                other_object.dead = True
+                if other_object.velocity.magnitude() > 5 or self.type != 'planet':
+                    other_object.dead = True
+                else:
+                    other_object.position.x = self.position.x - (self.radius + other_object.hitbox_radius)*cos(radians(angle))
+                    other_object.position.y = self.position.y + (self.radius + other_object.hitbox_radius)*sin(radians(angle))

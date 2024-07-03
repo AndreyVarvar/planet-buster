@@ -1,8 +1,7 @@
 from src.utils.texture import Animation
-import pygame as pg
 from math import atan2, sin, cos, radians, degrees, sqrt
 import random
-
+from src.utils.constants import *
 
 
 class Enemy(Animation):
@@ -28,11 +27,13 @@ class Enemy(Animation):
         self.cd = 1
 
         self.in_pursuit = False
+        self.close_to_crashing = False
 
     def update(self, *args):
         dt = args[0]
         player_pos = args[1]
         map_boundaries = args[2]
+        scroll = args[3]
 
         super().update(dt)
 
@@ -48,6 +49,7 @@ class Enemy(Animation):
             clockwise_diff = (target_rotation - self.rotation) % 360
             counterclockwise_diff = (self.rotation - target_rotation) % 360
 
+            # pursuit the player if spotted
             if self.in_pursuit is False:
                 pass
             elif clockwise_diff <= counterclockwise_diff and abs(clockwise_diff) > 2:
@@ -75,7 +77,7 @@ class Enemy(Animation):
             self.position[1] += self.velocity.y
 
             # spawning lasers
-            if distance_to_player < 400 and self.laser_cooldown < 0:
+            if distance_to_player < 500 and self.laser_cooldown < 0 and self.in_pursuit:
                 self.spawn_laser = True
                 self.laser_cooldown = self.cd + random.randint(0, 3000)/1000
             else:
@@ -85,11 +87,26 @@ class Enemy(Animation):
             # make sure we don't leave out of bounds
             if (self.position.x-self.hitbox_radius) < map_boundaries.left:
                 self.velocity.x = 0
-                self.position.x = map_boundaries.left
+                self.position.x = map_boundaries.left + self.hitbox_radius
+            elif (self.position.x+self.hitbox_radius) > map_boundaries.right:
+                self.velocity.x = 0
+                self.position.x = map_boundaries.right - self.hitbox_radius
+
+            if (self.position.y - self.hitbox_radius) < map_boundaries.top:
+                self.velocity.y = 0
+                self.position.y = map_boundaries.top + self.hitbox_radius
+            elif (self.position.y + self.hitbox_radius) > map_boundaries.bottom:
+                self.velocity.y = 0
+                self.position.y = map_boundaries.bottom - self.hitbox_radius
 
         # switch to dead
         else:
-            if self.playing_animation is False:
+            if self.playing_animation is False:  # just died
+                scroll[0] += random.randint(-100, 100)
+                scroll[1] += random.randint(-100, 100)
+
+                random.choice(explosion).play()
+
                 self.playing_animation = True
                 self.rotation = 0
                 super().__init__(self.position, 'assets/textures/spritesheets/explosion.png', (96, 96), 5, 1)
@@ -101,4 +118,5 @@ class Enemy(Animation):
     def draw(self, *args):
         surf = args[0]
         scroll = args[1]
-        super().draw(surf, scroll, self.rotation-90, 2)
+        time = args[2]
+        super().draw(surf, scroll, self.rotation-90, 2, angle=time, strength=2)

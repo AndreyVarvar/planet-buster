@@ -17,5 +17,5 @@ class Scene:
     def update(self, *args):
         pass  # in here we need logic for switching scenes
 
-    def load(self, *args):
+    def reset(self, *args):
         pass  # what happens when we load the scene, maybe resetting a bunch of stuff, idk
