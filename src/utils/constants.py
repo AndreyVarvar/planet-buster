@@ -9,6 +9,9 @@ FPS = 100
 
 # colors
 BLACK = (13, 0, 26)
+YELLOW = (242, 236, 139)
+ORANGE = (251, 185, 84)
+RED = (153, 61, 65)
 
 # scene names
 MAIN_MENU = 'main menu'
@@ -19,8 +22,3 @@ pixel_sans_font = pg.font.Font('assets/fonts/Pixelify_Sans/PixelifySans-Variable
 
 # sounds
 explosion = [pg.mixer.Sound('assets/sfx/explosion.wav'), pg.mixer.Sound('assets/sfx/explosion1.wav'), pg.mixer.Sound('assets/sfx/explosion2.wav')]
-
-
-# settings
-SFX_VOLUME = 1
-MUSIC_VOLUME = 1

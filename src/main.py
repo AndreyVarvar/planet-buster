@@ -23,6 +23,12 @@ class Game:
 
         self.dt = 0
 
+        # settings
+        self.settings = {
+            'sfx volume': 1,
+            'music volume': 1
+        }
+
     def run(self):
         while self.running:
             self.dt = self.clock.tick(FPS)/1000
@@ -44,7 +50,7 @@ class Game:
         pg.display.update()
 
     def update(self):
-        self.scene_manager.update(pg.mouse.get_pos(), self.cursor, self.dt, self.scroll, pg.key.get_pressed())
+        self.scene_manager.update(pg.mouse.get_pos(), self.cursor, self.dt, self.scroll, pg.key.get_pressed(), self.settings)
 
         self.cursor.update(pg.mouse.get_pressed())
 

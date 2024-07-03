@@ -13,105 +13,121 @@ class Slider(Thingy):
                  min_value: float,
                  max_value: float,
                  initial_value: float,
-                 step: float):
+                 step: float,
+                 description=''):
         super().__init__(position)
 
-        self.rail_size = rail_size
-        self.knob_size = knob_size
+        self.rail = pg.Rect(self.position.x-rail_size[0]//2, self.position.y-rail_size[1]//2, rail_size[0], rail_size[1])  # rail rect
+        self.knob = pg.Rect(self.position.x-knob_size[0]//2, self.position.y-knob_size[1]//2, knob_size[0], knob_size[1])  # knob rect
 
         self.min_value = min_value
         self.max_value = max_value
         self.range = max_value - min_value
 
+        self.slide_sound = pg.mixer.Sound('assets/sfx/slider_slide.wav')
+        self.prev_value = initial_value
+
         self.initial_value = initial_value
         self.step = step
 
         self.slider_texture_parts = load_slider_spritesheet()
+        # scale each part appropriately
+        for part in ['br', 'dr']:
+            img = self.slider_texture_parts[part]
+            self.slider_texture_parts[part] = pg.transform.scale_by(img, rail_size[1]/img.size[1])
+
+        knob = self.slider_texture_parts['knob']
+        self.slider_texture_parts['knob'] = pg.transform.scale_by(knob, knob_size[1] / knob.size[1])
 
 
-class IDK:
-    def __init__(self,
-                 rect: pg.Rect,
-                 min_value: float,
-                 max_value: float,
-                 initial_value: float,
-                 step: float,
-                 value_rounding_accuracy=5
-                 ):
-        self.min_value = min_value
-        self.max_value = max_value
-        self.range = self.max_value - self.min_value
-        self.rect = rect
-        self.step = step
-        self.rail = rect.inflate(0, -0.8 * rect.height)
-        self.x, self.y = rect.x + rect.width*(initial_value/self.range), rect.centery
-        self.clicked = False
         self.positional_step = self.rail.width / (self.range / self.step)
 
-        self.slider_images = [pg.transform.scale_by(surf, self.rail.height/4) for surf in load_slider_spritesheet()]
-        self.height = self.slider_images[6].get_height()
+        self.knob_pos = pg.Vector2(self.rail.x + self.rail.width*(initial_value/self.range), self.rail.centery)
+
+        self.knob_size = self.slider_texture_parts['knob'].size
 
         self.value = initial_value
-        self.value_rounding_accuracy = value_rounding_accuracy
 
-    def calculate_slider_value(self):
-        self.value = self.min_value + round((self.x - self.rail.x)*(self.range / self.rect.width), self.value_rounding_accuracy)
-        self.value = max(self.min_value, min(self.max_value, self.value))
+        self.clicked = False
 
-    def calculate_slider_pos(self):
-        self.x = round(self.x/self.positional_step)*self.positional_step
+        self.render_description = description != ''
+        self.description = pixel_sans_font.render(description, True, ORANGE)
 
-    def update(self, mouse_pos, cursor):
+    def update(self, mouse_pos, cursor, sfx_volume):
         if not cursor.holding:
             self.clicked = False
         else:
             if self.clicked:
                 self.clamp_rail(mouse_pos)
-                self.calculate_slider_pos()
+                self.calculate_knob_pos()
                 self.calculate_slider_value()
 
-                self.x = max(self.rail.x, min(self.x, self.rail.x + self.rail.width))  # if the position eve gets out of bounds, it will get corrected here
+                self.knob_pos.x = max(self.rail.x, min(self.knob_pos.x, self.rail.x + self.rail.width))  # if the position eve gets out of bounds, it will get corrected here
             else:
-                if self.rect.collidepoint(mouse_pos) and cursor.just_pressed:
+                if self.rail.collidepoint(mouse_pos) and cursor.just_pressed:
                     self.clicked = True
 
+        if self.value != self.prev_value:
+            self.prev_value = self.value
+            self.slide_sound.play()
+
+        self.slide_sound.set_volume(sfx_volume)
+
+    def draw(self, *args):
+        surf = args[0]
+
+        # step 1: draw the bright side (the left one)
+        bright = self.slider_texture_parts['br']
+
+        duration = round(self.knob_pos.x - self.rail.x)
+
+        for i in range(duration):
+            surf.blit(bright, (self.rail.x+i, self.position.y-self.rail.height//2))
+
+        # step 2: draw the dark side
+        dark = self.slider_texture_parts['dr']
+
+        duration = round(self.rail.x + self.rail.width - self.knob_pos.x)
+
+        for i in range(duration):
+            surf.blit(dark, (self.rail.x+self.rail.width-i, self.position.y-self.rail.height//2))
+
+        # step 3: draw the knob
+        knob = self.slider_texture_parts['knob']
+
+        pos = knob.get_rect(center=self.knob_pos)
+
+        surf.blit(knob, pos)
+
+        # draw description
+        if self.render_description:
+            pos = self.description.get_rect(center=(self.position.x, self.position.y-self.knob_size[1]-20))
+            surf.blit(self.description, pos)
+
     def clamp_rail(self, mouse_pos):
-        self.x = max(self.rail.left, min(mouse_pos[0], self.rail.right))
+        # adjust the knob position to the mouse position, but also makes sure we don't bring it outside the min and max values
+        self.knob_pos.x = max(self.rail.left, min(mouse_pos[0], self.rail.right))
 
-    def draw(self, surf):
-        bright_part_of_slider = pg.transform.scale(self.slider_images[1], (self.x-self.rail.x, self.slider_images[1].get_height()))
-        dark_side_of_slider = pg.transform.scale(self.slider_images[4], (self.rail.width - (self.x-self.rail.x), self.slider_images[4].get_height()))
+    def calculate_slider_value(self):
+        # based on position, calculates what value it has
+        self.value = self.min_value + round((self.knob_pos.x - self.rail.x - 1)*(self.range / self.rail.width), 1)
+        self.value = max(self.min_value, min(self.max_value, self.value))
 
-        surf.blit(bright_part_of_slider, (self.rail.x, self.rail.y))
-        surf.blit(self.slider_images[0], (self.rail.x, self.rail.y))
-
-        surf.blit(dark_side_of_slider, (self.x, self.rail.y))
-        surf.blit(self.slider_images[5], (self.rail.right, self.rail.y))
-
-        surf.blit(self.slider_images[6], (self.x - self.height//2, self.y - self.height//2))
-
-
+    def calculate_knob_pos(self):
+        self.knob_pos.x = self.rail.x + round((self.knob_pos.x-self.rail.x)/self.positional_step)*self.positional_step  # round to the nearest 'step' value
 
 def load_slider_spritesheet():
     spritesheet = pg.image.load('assets/textures/UI/slider_spritesheet.png')
 
-    bright_part_start = spritesheet.subsurface(pg.Rect(0, 0, 3, 8)).copy()
-    bright_part_continuing = spritesheet.subsurface(pg.Rect(4, 0, 1, 8)).copy()
-    bright_part_end = spritesheet.subsurface(pg.Rect(6, 0, 1, 8)).copy()
+    bright_side = spritesheet.subsurface(pg.Rect(14, 0, 1, 10)).copy()
 
-    dark_part_start = spritesheet.subsurface(pg.Rect(4, 8, 1, 8)).copy()
-    dark_part_continuing = spritesheet.subsurface(pg.Rect(4, 8, 1, 8)).copy()
-    dark_part_end = spritesheet.subsurface(pg.Rect(4, 8, 1, 8)).copy()
+    dark_side = spritesheet.subsurface(pg.Rect(12, 0, 1, 10)).copy()
 
-    knob = spritesheet.subsurface(pg.Rect(9, 0, 7, 16)).copy()
+    knob = spritesheet.subsurface(pg.Rect(0, 0, 10, 10)).copy()
 
     slider = {
-        'br_start': bright_part_start,
-        'br_mid': bright_part_continuing,
-        'br_end': bright_part_end,
-        'dr_start': dark_part_start,
-        'dr_mid': dark_part_continuing,
-        'dr_end': dark_part_end,
+        'br': bright_side,
+        'dr': dark_side,
         'knob': knob
     }
 

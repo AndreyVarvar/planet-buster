@@ -30,6 +30,10 @@ class Button(Thingy):
     def update(self, *args):
         mouse_pos = args[0]
         cursor = args[1]
+        sfx_volume = args[2]
+
+        self.hover_sound.set_volume(sfx_volume)
+        self.click_sound.set_volume(sfx_volume)
 
 
         if self.rect.collidepoint(mouse_pos) and not self.hovered:  # update the button
