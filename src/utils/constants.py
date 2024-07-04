@@ -19,6 +19,3 @@ SETTINGS = 'settings'
 MAIN_GAME = 'game'
 
 pixel_sans_font = pg.font.Font('assets/fonts/Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 40)
-
-# sounds
-explosion = [pg.mixer.Sound('assets/sfx/explosion.wav'), pg.mixer.Sound('assets/sfx/explosion1.wav'), pg.mixer.Sound('assets/sfx/explosion2.wav')]

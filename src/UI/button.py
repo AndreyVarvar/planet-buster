@@ -7,12 +7,6 @@ class Button(Thingy):
     def __init__(self, position, size, text='', texture=BLANK, hover_texture=BLANK, font=pg.font.SysFont('the default one', 50), text_color=(255, 255, 255)):
         super().__init__(position)
 
-        self.hover_sound = pg.mixer.Sound('assets/sfx/button_hover.wav')
-        self.click_sound = pg.mixer.Sound('assets/sfx/button_pressed.wav')
-
-        self.hover_sound.set_volume(0.5)
-        self.click_sound.set_volume(0.5)
-
         self.pressed = False
         self.hovered = False
 
@@ -30,16 +24,13 @@ class Button(Thingy):
     def update(self, *args):
         mouse_pos = args[0]
         cursor = args[1]
-        sfx_volume = args[2]
-
-        self.hover_sound.set_volume(sfx_volume)
-        self.click_sound.set_volume(sfx_volume)
+        sound_manager = args[2]
 
 
         if self.rect.collidepoint(mouse_pos) and not self.hovered:  # update the button
             self.hovered = True
 
-            self.hover_sound.play()
+            sound_manager.play('ui-button-hover')
 
         elif not self.rect.collidepoint(mouse_pos):
             self.hovered = False
@@ -50,7 +41,7 @@ class Button(Thingy):
 
         if cursor.just_released and self.hovered:
             self.pressed = True
-            self.click_sound.play()
+            sound_manager.play('ui-button-click')
         else:
             self.pressed = False
 

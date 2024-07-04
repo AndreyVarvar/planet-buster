@@ -34,6 +34,7 @@ class Player(Animation):
         keys_pressed = args[3]
         cursor = args[4]
         map_boundaries = args[5]
+        sound_manager = args[6]
 
         super().update(dt)
 
@@ -61,6 +62,7 @@ class Player(Animation):
             self.position[0] += self.velocity.x
             self.position[1] += self.velocity.y
 
+            # update scroll
             new_scroll = self.position.lerp(pg.Vector2(scroll)+pg.Vector2(mouse_pos)-pg.Vector2(WIDTH//2, HEIGHT//2), 0.2)
             scroll[0] = (new_scroll[0]+scroll[0])/2
             scroll[1] = (new_scroll[1]+scroll[1])/2
@@ -106,7 +108,7 @@ class Player(Animation):
                 scroll[0] += random.randint(-100, 100)
                 scroll[1] += random.randint(-100, 100)
 
-                random.choice(explosion).play()
+                sound_manager.play('explosion')
 
                 self.playing_animation = True
                 self.rotation = 90

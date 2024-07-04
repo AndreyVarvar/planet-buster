@@ -13,7 +13,7 @@ class Enemy(Animation):
 
         self.velocity = pg.Vector2()
         self.acceleration = 10
-        self.max_speed = 20
+        self.max_speed = 25
 
         self.dead = False
         self.playing_animation = False
@@ -34,6 +34,7 @@ class Enemy(Animation):
         player_pos = args[1]
         map_boundaries = args[2]
         scroll = args[3]
+        sound_manager = args[4]
 
         super().update(dt)
 
@@ -105,7 +106,7 @@ class Enemy(Animation):
                 scroll[0] += random.randint(-100, 100)
                 scroll[1] += random.randint(-100, 100)
 
-                random.choice(explosion).play()
+                sound_manager.play('explosion')
 
                 self.playing_animation = True
                 self.rotation = 0

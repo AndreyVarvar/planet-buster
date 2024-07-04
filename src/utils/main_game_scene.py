@@ -21,7 +21,6 @@ class MainGame(Scene):
     def draw_scene(self, *args):
         surf = args[0]
         scroll = args[2]
-        surf.fill(BLACK)
 
         for planet in self.planets:
             planet.draw(surf, scroll, self.time)
@@ -34,14 +33,22 @@ class MainGame(Scene):
 
         self.player.draw(surf, scroll, self.time)
 
+        player_pos_text = pixel_sans_font.render(f'[{round(self.player.position.x/10)}, {round(self.player.position.y/10)}]', True, (255, 255, 255))
+        surf.blit(player_pos_text, (10, 10))
+
     def update(self, *args):
         mouse_pos = args[0]
         cursor = args[1]
         dt = args[2]
         scroll = args[3]
         keys_pressed = args[4]
+        sound_manager = args[5]
+        background = args[6]
 
         self.time += dt
+
+        # update the background according to the scroll
+        background.position = -pg.Vector2(scroll)
 
         # update every planet
         for planet in self.planets:
@@ -54,7 +61,7 @@ class MainGame(Scene):
                 planet.apply_gravity(enemy, dt)
 
         # update the player
-        self.player.update(dt, mouse_pos, scroll, keys_pressed, cursor, self.map_boundaries)
+        self.player.update(dt, mouse_pos, scroll, keys_pressed, cursor, self.map_boundaries, sound_manager)
 
         # update projectiles
         for projectile in self.projectiles.copy():
@@ -65,7 +72,7 @@ class MainGame(Scene):
 
         # update enemies
         for enemy in self.enemies.copy():
-            enemy.update(dt, self.player.position, self.map_boundaries, scroll)
+            enemy.update(dt, self.player.position, self.map_boundaries, scroll, sound_manager)
 
             if enemy.spawn_laser:  # spawn lasers
                 self.projectiles.append(Projectile(enemy.position, 2, 1000, 20, 180+degrees(atan2(-enemy.position.y+self.player.position.y, enemy.position.x-self.player.position.x))))

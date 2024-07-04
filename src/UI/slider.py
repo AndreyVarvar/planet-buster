@@ -24,7 +24,6 @@ class Slider(Thingy):
         self.max_value = max_value
         self.range = max_value - min_value
 
-        self.slide_sound = pg.mixer.Sound('assets/sfx/slider_slide.wav')
         self.prev_value = initial_value
 
         self.initial_value = initial_value
@@ -32,9 +31,11 @@ class Slider(Thingy):
 
         self.slider_texture_parts = load_slider_spritesheet()
         # scale each part appropriately
-        for part in ['br', 'dr']:
+        scale_factor = rail_size[1]/self.slider_texture_parts['br'].size[1]
+
+        for part in ['br', 'dr', 'br_start', 'dr_end']:
             img = self.slider_texture_parts[part]
-            self.slider_texture_parts[part] = pg.transform.scale_by(img, rail_size[1]/img.size[1])
+            self.slider_texture_parts[part] = pg.transform.scale_by(img, scale_factor)
 
         knob = self.slider_texture_parts['knob']
         self.slider_texture_parts['knob'] = pg.transform.scale_by(knob, knob_size[1] / knob.size[1])
@@ -53,7 +54,7 @@ class Slider(Thingy):
         self.render_description = description != ''
         self.description = pixel_sans_font.render(description, True, ORANGE)
 
-    def update(self, mouse_pos, cursor, sfx_volume):
+    def update(self, mouse_pos, cursor, sound_manager):
         if not cursor.holding:
             self.clicked = False
         else:
@@ -69,28 +70,32 @@ class Slider(Thingy):
 
         if self.value != self.prev_value:
             self.prev_value = self.value
-            self.slide_sound.play()
-
-        self.slide_sound.set_volume(sfx_volume)
+            sound_manager.play('ui-slider-slide')
 
     def draw(self, *args):
         surf = args[0]
 
         # step 1: draw the bright side (the left one)
         bright = self.slider_texture_parts['br']
+        bright_start = self.slider_texture_parts['br_start']
 
         duration = round(self.knob_pos.x - self.rail.x)
 
-        for i in range(duration):
+        for i in range(bright_start.size[0], duration):
             surf.blit(bright, (self.rail.x+i, self.position.y-self.rail.height//2))
+
+        surf.blit(bright_start, (self.rail.x, bright_start.size[0]+self.position.y - self.rail.height // 2))
 
         # step 2: draw the dark side
         dark = self.slider_texture_parts['dr']
+        dark_end = self.slider_texture_parts['dr_end']
 
         duration = round(self.rail.x + self.rail.width - self.knob_pos.x)
 
         for i in range(duration):
             surf.blit(dark, (self.rail.x+self.rail.width-i, self.position.y-self.rail.height//2))
+
+        surf.blit(dark_end, (self.rail.x+self.rail.width+dark_end.size[0], dark_end.size[0] + self.position.y - self.rail.height // 2))
 
         # step 3: draw the knob
         knob = self.slider_texture_parts['knob']
@@ -116,18 +121,23 @@ class Slider(Thingy):
     def calculate_knob_pos(self):
         self.knob_pos.x = self.rail.x + round((self.knob_pos.x-self.rail.x)/self.positional_step)*self.positional_step  # round to the nearest 'step' value
 
+
 def load_slider_spritesheet():
     spritesheet = pg.image.load('assets/textures/UI/slider_spritesheet.png')
 
     bright_side = spritesheet.subsurface(pg.Rect(14, 0, 1, 10)).copy()
+    bright_side_start = spritesheet.subsurface(pg.Rect(15, 1, 1, 8)).copy()
 
     dark_side = spritesheet.subsurface(pg.Rect(12, 0, 1, 10)).copy()
+    dark_side_start = spritesheet.subsurface(pg.Rect(11, 1, 1, 8)).copy()
 
     knob = spritesheet.subsurface(pg.Rect(0, 0, 10, 10)).copy()
 
     slider = {
         'br': bright_side,
         'dr': dark_side,
+        'br_start': bright_side_start,
+        'dr_end': dark_side_start,
         'knob': knob
     }
 
