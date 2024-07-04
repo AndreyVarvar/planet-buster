@@ -4,11 +4,11 @@ import pygame as pg
 
 
 class Projectile(Animation):
-    def __init__(self, position, type, speed, power, rotation, scale=1):
+    def __init__(self, position, type, speed, power, rotation, sound_manager, scale=1):
         super().__init__(position, 'assets/textures/spritesheets/laser.png', (32, 32))
         self.texture = self.animation[type]
 
-        pg.mixer.Sound('assets/sfx/laser.wav').play()
+        sound_manager.play('laser-fired')
 
         self.type = type
         self.speed = speed

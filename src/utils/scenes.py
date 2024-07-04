@@ -34,8 +34,11 @@ class MainMenu(Scene):
         cursor = args[1]
         dt = args[2]
         sound_manager = args[5]
+        background = args[6]
 
         self.time += dt
+
+        background.position = pg.Vector2(background.position.x, background.position.y + 2)
 
         self.button1.update(mouse_pos, cursor, sound_manager)
         self.button2.update(mouse_pos, cursor, sound_manager)
@@ -57,9 +60,9 @@ class MainMenu(Scene):
             self.change_to = 'quit'
 
     def scene_thingies_init(self, *args):
-        self.button1 = Button((500, 400), (400, 80), text='play', font=pixel_sans_font, texture=button_outline, hover_texture=button_outline_hovered, text_color=ORANGE)
-        self.button2 = Button((500, 500), (400, 80), text='settings', font=pixel_sans_font, texture=button_outline, hover_texture=button_outline_hovered, text_color=ORANGE)
-        self.button3 = Button((500, 600), (400, 80), text='quit', font=pixel_sans_font, texture=button_outline, hover_texture=button_outline_hovered, text_color=RED)
+        self.button1 = Button((500, 400), (400, 80), text='play', font=default_font, texture=button_outline, hover_texture=button_outline_hovered, text_color=ORANGE, text_with_shadow=True, shadow_color=RED)
+        self.button2 = Button((500, 500), (400, 80), text='settings', font=default_font, texture=button_outline, hover_texture=button_outline_hovered, text_color=ORANGE, text_with_shadow=True, shadow_color=RED)
+        self.button3 = Button((500, 600), (400, 80), text='quit', font=default_font, texture=button_outline, hover_texture=button_outline_hovered, text_color=RED, text_with_shadow=True, shadow_color=BLACK)
 
         self.logo = Texture((0, -225), 'assets/textures/sprites/planet_buster_logo.png')
 
@@ -82,11 +85,14 @@ class Settings(Scene):
         mouse_pos = args[0]  # just for clarity
         cursor = args[1]
         sound_manager = args[5]
+        background = args[6]
 
         self.button1.update(mouse_pos, cursor, sound_manager)
 
         self.slider1.update(mouse_pos, cursor, sound_manager)
         sound_manager.set_volume(self.slider1.value)
+
+        background.position = pg.Vector2(background.position.x, background.position.y + self.slider1.value*10 + 1)
 
         self.slider2.update(mouse_pos, cursor, sound_manager)
 
@@ -95,10 +101,10 @@ class Settings(Scene):
             self.change_to = MAIN_MENU
 
     def scene_thingies_init(self, *args):
-        self.button1 = Button((500, 100), (400, 80), text='back', font=pixel_sans_font, texture=button_outline, hover_texture=button_outline_hovered, text_color=ORANGE)
+        self.button1 = Button((500, 100), (400, 80), text='back', font=default_font, texture=button_outline, hover_texture=button_outline_hovered, text_color=ORANGE, text_with_shadow=True, shadow_color=RED)
 
-        self.slider1 = Slider((500, 300), (400, 30), (50, 50), 0, 1, 0.3, 0.1, 'sfx volume')
-        self.slider2 = Slider((500, 450), (400, 30), (50, 50), 0, 1, 1, 0.1, 'music volume')
+        self.slider1 = Slider((500, 300), (400, 30), (50, 50), 0, 1, 0.3, 0.01, 'sfx volume', desc_with_shadow=True, shadow_color=RED)
+        self.slider2 = Slider((500, 450), (400, 30), (50, 50), 0, 1, 1, 0.01, 'music volume', desc_with_shadow=True, shadow_color=RED)
 
 
 MainMenu(scene_manager)  # initializing for it to be added to the scene_manager list

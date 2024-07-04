@@ -1,10 +1,9 @@
 from src.utils.thingy import Thingy
-import pygame as pg
-from src.utils.constants import BLANK
-
+from src.utils.constants import *
+from src.utils.utilities import render_text_with_shadow
 
 class Button(Thingy):
-    def __init__(self, position, size, text='', texture=BLANK, hover_texture=BLANK, font=pg.font.SysFont('the default one', 50), text_color=(255, 255, 255)):
+    def __init__(self, position, size, text='', texture=BLANK, hover_texture=BLANK, font=pg.font.SysFont('the default one', 50), text_color=(255, 255, 255), text_with_shadow=False, shadow_color=(128, 128, 128)):
         super().__init__(position)
 
         self.pressed = False
@@ -16,8 +15,12 @@ class Button(Thingy):
         self.texture = texture
         self.hover_texture = hover_texture
 
+
         if self.text != '':
-            self.text_texture = font.render(text, True, text_color)
+            if text_with_shadow:
+                self.text_texture = render_text_with_shadow(2, text, text_color, shadow_color)
+            else:
+                self.text_texture = font.render(text, True, text_color)
 
             self.text_pos = self.text_texture.get_rect(center=self.rect.center)
 

@@ -18,4 +18,4 @@ MAIN_MENU = 'main menu'
 SETTINGS = 'settings'
 MAIN_GAME = 'game'
 
-pixel_sans_font = pg.font.Font('assets/fonts/Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 40)
+default_font = pg.font.Font('assets/fonts/VCR_OSD_MONO_1.001.ttf', 40)

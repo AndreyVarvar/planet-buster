@@ -70,7 +70,7 @@ class Enemy(Animation):
                 self.velocity.x += cos(radians(rotation)) * self.acceleration * dt
                 self.velocity.y -= sin(radians(rotation)) * self.acceleration * dt
             else:
-                self.velocity /= 1.1
+                self.velocity /= 1.05
 
             self.velocity = self.velocity.clamp_magnitude(self.max_speed)
 

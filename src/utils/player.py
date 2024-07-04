@@ -14,7 +14,7 @@ class Player(Animation):
 
         self.velocity = pg.Vector2()
         self.acceleration = 10
-        self.max_speed = 20
+        self.max_speed = 700
 
         self.dead = False
         self.playing_animation = False
@@ -47,11 +47,16 @@ class Player(Animation):
             if keys_pressed[pg.K_RIGHT] or keys_pressed[pg.K_d]:
                 self.rotation -= self.angular_velocity * dt
 
-
             # updating the position
-            if (keys_pressed[pg.K_UP] or keys_pressed[pg.K_w]) and self.velocity.magnitude() < self.max_speed//2:
-                self.velocity.x += cos(radians(self.rotation))*self.acceleration * dt
-                self.velocity.y -= sin(radians(self.rotation))*self.acceleration * dt
+            if keys_pressed[pg.K_UP] or keys_pressed[pg.K_w]:
+                additional_velocity = pg.Vector2()
+
+                additional_velocity.x += cos(radians(self.rotation))*self.acceleration
+                additional_velocity.y -= sin(radians(self.rotation))*self.acceleration
+
+                additional_velocity.clamp_magnitude(max(0, (self.max_speed//2)-self.velocity.magnitude()))
+
+                self.velocity += additional_velocity
 
 
             if keys_pressed[pg.K_DOWN] or keys_pressed[pg.K_s] or keys_pressed[pg.K_SPACE] or keys_pressed[pg.KMOD_SHIFT]:
@@ -59,8 +64,8 @@ class Player(Animation):
 
             self.velocity = self.velocity.clamp_magnitude(self.max_speed)
 
-            self.position[0] += self.velocity.x
-            self.position[1] += self.velocity.y
+            self.position[0] += self.velocity.x * dt
+            self.position[1] += self.velocity.y * dt
 
             # update scroll
             new_scroll = self.position.lerp(pg.Vector2(scroll)+pg.Vector2(mouse_pos)-pg.Vector2(WIDTH//2, HEIGHT//2), 0.2)

@@ -1,5 +1,6 @@
 from src.utils.constants import *
 from src.utils.thingy import Thingy
+from src.utils.utilities import *
 
 # I am afraid of this file, for I do not know the ways this files is working in to work.
 # I wish luck to whoever wants to reverse engineer this pile of mess
@@ -14,7 +15,9 @@ class Slider(Thingy):
                  max_value: float,
                  initial_value: float,
                  step: float,
-                 description=''):
+                 description='',
+                 desc_with_shadow=False,
+                 shadow_color=(128, 128, 128)):
         super().__init__(position)
 
         self.rail = pg.Rect(self.position.x-rail_size[0]//2, self.position.y-rail_size[1]//2, rail_size[0], rail_size[1])  # rail rect
@@ -51,8 +54,10 @@ class Slider(Thingy):
 
         self.clicked = False
 
-        self.render_description = description != ''
-        self.description = pixel_sans_font.render(description, True, ORANGE)
+        if desc_with_shadow:
+            self.description = render_text_with_shadow(2, description, ORANGE, RED)
+        else:
+            self.description = default_font.render(description, True, ORANGE)
 
     def update(self, mouse_pos, cursor, sound_manager):
         if not cursor.holding:
@@ -105,9 +110,8 @@ class Slider(Thingy):
         surf.blit(knob, pos)
 
         # draw description
-        if self.render_description:
-            pos = self.description.get_rect(center=(self.position.x, self.position.y-self.knob_size[1]-20))
-            surf.blit(self.description, pos)
+        pos = self.description.get_rect(center=(self.position.x, self.position.y-self.knob_size[1]-20))
+        surf.blit(self.description, pos)
 
     def clamp_rail(self, mouse_pos):
         # adjust the knob position to the mouse position, but also makes sure we don't bring it outside the min and max values

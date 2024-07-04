@@ -22,6 +22,7 @@ class Game:
         self.sound_manager.add('ui-button-hover', pg.mixer.Sound('assets/sfx/button_hover.wav'))
         self.sound_manager.add('ui-button-click', pg.mixer.Sound('assets/sfx/button_pressed.wav'))
         self.sound_manager.add('ui-slider-slide', pg.mixer.Sound('assets/sfx/slider_slide.wav'))
+        self.sound_manager.add('laser-fired', pg.mixer.Sound('assets/sfx/laser.wav'))
 
         self.sound_manager.set_volume(0.33)
 
