@@ -1,12 +1,12 @@
-from src.utils.texture import Animation
+from src.utils.animation import Animation
 from math import atan2, sin, cos, radians, degrees, sqrt
 import random
 from src.utils.constants import *
 
 
 class Enemy(Animation):
-    def __init__(self, position):
-        super().__init__(position, 'assets/textures/spritesheets/enemy-spaceship.png', (32, 32), 2)
+    def __init__(self, position, sprite_manager):
+        super().__init__(position, 'enemy', sprite_manager, 2, scale=2, drawing_rotation=-90)
 
         self.hitbox_radius = 50
         self.rotation = 0
@@ -35,6 +35,7 @@ class Enemy(Animation):
         map_boundaries = args[2]
         scroll = args[3]
         sound_manager = args[4]
+        sprite_manager = args[5]
 
         super().update(dt)
 
@@ -117,7 +118,7 @@ class Enemy(Animation):
 
                 self.playing_animation = True
                 self.rotation = 0
-                super().__init__(self.position, 'assets/textures/spritesheets/explosion.png', (96, 96), 5, 1)
+                super().__init__(self.position, 'explosion', sprite_manager, 5)
 
             if self.animation_end:
                 self.really_dead_and_should_be_destroyed = True
@@ -127,4 +128,5 @@ class Enemy(Animation):
         surf = args[0]
         scroll = args[1]
         time = args[2]
-        super().draw(surf, scroll, self.rotation-90, 2, angle=time, strength=2)
+        # self.rotation-90, 2, angle=time, strength=1
+        super().draw(surf, scroll, offset=(cos(time), sin(time)))

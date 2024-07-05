@@ -1,8 +1,15 @@
 from src.utils.constants import *
-from src.utils.scene_manager import scene_manager  # crazy namings
 
 from src.utils.cursor import Cursor
+
+# managers
 from src.utils.sound_manager import SoundManager
+from src.utils.scene_manager import SceneManager  # crazy namings
+from src.utils.sprite_manager import SpriteManager
+
+# scenes
+from src.utils.scenes import MainMenu, Settings
+from src.utils.main_game_scene import MainGame
 
 from src.utils.background_sky import BackGroundSky
 
@@ -14,8 +21,6 @@ class Game:
         self.display = display
         self.running = True
 
-        self.scene_manager = scene_manager
-
         # settings up sound manager
         self.sound_manager = SoundManager()
         self.sound_manager.add('explosion', [pg.mixer.Sound('assets/sfx/explosion.wav'), pg.mixer.Sound('assets/sfx/explosion1.wav'), pg.mixer.Sound('assets/sfx/explosion2.wav')], 'multiple')
@@ -26,10 +31,22 @@ class Game:
 
         self.sound_manager.set_volume(0.33)
 
+        # setting up sprite manager
+        self.sprite_manager = SpriteManager()
 
-        self.scene_manager.current_scene = scene_manager.scenes['main menu']
+        self.sprite_manager.add('sky', 'assets/textures/sprites/star_sky.png')
+        self.sprite_manager.add('sky2', 'assets/textures/sprites/star_sky2.png')
 
-        self.background = BackGroundSky()
+        # setting up the scene manager
+        self.scene_manager = SceneManager()
+        self.scene_manager.add_scene(MAIN_MENU, MainMenu)
+        self.scene_manager.add_scene(SETTINGS, Settings)
+        self.scene_manager.add_scene(MAIN_GAME, MainGame)
+
+        self.scene_manager.current_scene = self.scene_manager.scenes[MAIN_MENU](self.sprite_manager)
+
+
+        self.background = BackGroundSky(self.sprite_manager)
 
         self.scroll = [0, 0]
 
@@ -63,10 +80,9 @@ class Game:
         pg.display.update()
 
     def update(self):
-        self.scene_manager.update(pg.mouse.get_pos(), self.cursor, self.dt, self.scroll, pg.key.get_pressed(), self.sound_manager, self.background)
+        self.scene_manager.update(pg.mouse.get_pos(), self.cursor, self.dt, self.scroll, pg.key.get_pressed(), self.sound_manager, self.background, self.sprite_manager)
 
         self.cursor.update(pg.mouse.get_pressed())
 
         if self.scene_manager.leaving:
             self.running = False
-

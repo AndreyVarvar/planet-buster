@@ -1,22 +1,18 @@
-from src.utils.scene_manager import scene_manager
 from src.utils.scene import Scene
 from src.utils.constants import *
 
 from src.UI.button import Button
 from src.UI.slider import Slider
 
-from src.utils.texture import Texture
+from src.utils.thingy import Thingy
+
 from math import cos, sin
-
-
-button_outline = pg.image.load('assets/textures/UI/button_outline.png')
-button_outline_hovered = pg.image.load('assets/textures/UI/button_outline_hover.png')
 
 
 # here lie short scenes, that do not require a lot of space
 class MainMenu(Scene):
-    def __init__(self, scene_manager):
-        super().__init__(MAIN_MENU, scene_manager)
+    def __init__(self, *args):
+        super().__init__(MAIN_MENU, *args)
 
         self.time = 0
 
@@ -27,7 +23,7 @@ class MainMenu(Scene):
         self.button2.draw(surf)
         self.button3.draw(surf)
 
-        self.logo.draw(surf, (0, 0), 0, 2)
+        self.logo.draw(surf, (0, 0), (0, sin(self.time)))
 
     def update(self, *args):
         mouse_pos = args[0]
@@ -60,16 +56,25 @@ class MainMenu(Scene):
             self.change_to = 'quit'
 
     def scene_thingies_init(self, *args):
+        sprite_manager = args[0]
+
+        sprite_manager.add('button outline', 'assets/textures/UI/button_outline.png')
+        sprite_manager.add('button outline on hover', 'assets/textures/UI/button_outline_hover.png')
+        sprite_manager.add('logo', 'assets/textures/sprites/planet_buster_logo.png')
+
+        button_outline = sprite_manager.sprites['button outline']
+        button_outline_hovered = sprite_manager.sprites['button outline on hover']
+
         self.button1 = Button((500, 400), (400, 80), text='play', font=default_font, texture=button_outline, hover_texture=button_outline_hovered, text_color=ORANGE, text_with_shadow=True, shadow_color=RED)
         self.button2 = Button((500, 500), (400, 80), text='settings', font=default_font, texture=button_outline, hover_texture=button_outline_hovered, text_color=ORANGE, text_with_shadow=True, shadow_color=RED)
         self.button3 = Button((500, 600), (400, 80), text='quit', font=default_font, texture=button_outline, hover_texture=button_outline_hovered, text_color=RED, text_with_shadow=True, shadow_color=BLACK)
 
-        self.logo = Texture((0, -225), 'assets/textures/sprites/planet_buster_logo.png')
+        self.logo = Thingy((0, -225), sprite_manager.sprites['logo'], scale=2)
 
 
 class Settings(Scene):
-    def __init__(self, scene_manager):
-        super().__init__(SETTINGS, scene_manager)
+    def __init__(self, *args):
+        super().__init__(SETTINGS, *args)
 
     def draw_scene(self, *args):
         surf = args[0]
@@ -101,12 +106,17 @@ class Settings(Scene):
             self.change_to = MAIN_MENU
 
     def scene_thingies_init(self, *args):
+        sprite_manager = args[0]
+        sound_manager = args[1]
+
+        sprite_manager.add('button outline', 'assets/textures/UI/button_outline.png')
+        sprite_manager.add('button outline on hover', 'assets/textures/UI/button_outline_hover.png')
+
+        button_outline = sprite_manager.sprites['button outline']
+        button_outline_hovered = sprite_manager.sprites['button outline on hover']
+
         self.button1 = Button((500, 100), (400, 80), text='back', font=default_font, texture=button_outline, hover_texture=button_outline_hovered, text_color=ORANGE, text_with_shadow=True, shadow_color=RED)
 
-        self.slider1 = Slider((500, 300), (400, 30), (50, 50), 0, 1, 0.3, 0.01, 'sfx volume', desc_with_shadow=True, shadow_color=RED)
-        self.slider2 = Slider((500, 450), (400, 30), (50, 50), 0, 1, 1, 0.01, 'music volume', desc_with_shadow=True, shadow_color=RED)
-
-
-MainMenu(scene_manager)  # initializing for it to be added to the scene_manager list
-Settings(scene_manager)
+        self.slider1 = Slider((500, 300), (400, 30), (50, 50), 0, 1, sound_manager.volume, 0.05, 'sfx volume', desc_with_shadow=True, shadow_color=RED)
+        self.slider2 = Slider((500, 450), (400, 30), (50, 50), 0, 1, 1, 0.1, 'music volume', desc_with_shadow=True, shadow_color=RED)
 

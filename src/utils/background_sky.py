@@ -1,12 +1,11 @@
 from src.utils.constants import *
-import random
 
 
 class BackGroundSky:
     # parallax background of space filled with stars
-    def __init__(self):
-        self.sky = pg.image.load('assets/textures/sprites/star_sky.png')
-        self.sky2 = pg.image.load('assets/textures/sprites/star_sky2.png')
+    def __init__(self, sprite_manager):
+        self.sky = sprite_manager.sprites['sky']
+        self.sky2 = sprite_manager.sprites['sky2']
 
         self.position = pg.Vector2(0, 0)
 

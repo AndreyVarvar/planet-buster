@@ -5,22 +5,26 @@ from math import cos, sin, floor
 
 
 class Thingy:
-    def __init__(self, position=pg.Vector2(0, 0), texture=pg.Surface((10, 10))):
+    def __init__(self, position=pg.Vector2(0, 0), texture=pg.Surface((10, 10)), rotation=0, scale=1, drawing_angle_offset=0):
         self.position = pg.Vector2(position)
         self.texture = texture
 
-    def draw(self, surf, scroll, rotation=0, scale=1, angle=0, strength=0):
+        self.drawing_rotation = drawing_angle_offset
+        self.rotation = rotation
+        self.scale = scale
 
-        texture = pg.transform.scale_by(self.texture, scale)
-        texture = pg.transform.rotate(texture, rotation)
+    def draw(self, surf, scroll, offset=pg.Vector2(0, 0)):
+
+        texture = pg.transform.scale_by(self.texture, self.scale)
+        texture = pg.transform.rotate(texture, self.rotation+self.drawing_rotation)
 
         pos = texture.get_rect(center=self.position)
 
         pos.x -= scroll[0] - WIDTH // 2
         pos.y -= scroll[1] - HEIGHT // 2
 
-        pos.x += cos(angle)*strength
-        pos.y += sin(angle)*strength
+        pos.x += offset[0]
+        pos.y += offset[1]
 
         pos.x = floor(pos.x)
         pos.y = floor(pos.y)

@@ -1,5 +1,6 @@
 import pygame as pg
 
+
 class Cursor:
     def __init__(self):
         self.just_pressed = False

@@ -1,4 +1,4 @@
-from src.utils.texture import Animation
+from src.utils.animation import Animation
 import pygame as pg
 from math import sin, cos, radians, floor
 from src.utils.constants import *
@@ -6,8 +6,8 @@ import random
 
 
 class Player(Animation):
-    def __init__(self, position):
-        super().__init__(position, 'assets/textures/spritesheets/spaceship.png', (32, 32), 2)
+    def __init__(self, position, sprite_manager):
+        super().__init__(position, 'player', sprite_manager, 2, scale=2, drawing_rotation=-90)
 
         self.hitbox_radius = 25
         self.rotation = 0
@@ -35,6 +35,7 @@ class Player(Animation):
         cursor = args[4]
         map_boundaries = args[5]
         sound_manager = args[6]
+        sprite_manager = args[7]
 
         super().update(dt)
 
@@ -117,8 +118,7 @@ class Player(Animation):
 
                 self.playing_animation = True
                 self.rotation = 90
-                super().__init__(self.position, 'assets/textures/spritesheets/explosion.png', (96, 96), 5, 1)
-
+                super().__init__(self.position, 'explosion', sprite_manager, 5)
             scroll[0] += (-scroll[0]+self.position.x)/20
             scroll[1] += (-scroll[1]+self.position.y)/20
 
@@ -133,4 +133,4 @@ class Player(Animation):
         surf = args[0]
         scroll = args[1]
         time = args[2]
-        super().draw(surf, scroll, self.rotation-90, 2, angle=time, strength=2)
+        super().draw(surf, scroll, offset=(cos(time), sin(time)))

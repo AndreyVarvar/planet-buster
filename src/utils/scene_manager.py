@@ -8,6 +8,9 @@ class SceneManager:
         self.font = None
 
     def update(self, *args):
+        sound_manager = args[5]
+        sprite_manager = args[7]
+
         self.current_scene.update(*args)
 
         if self.current_scene.change_scene:
@@ -17,13 +20,13 @@ class SceneManager:
                 new_scene = self.current_scene.change_to
                 self.current_scene.change_to = None
 
-                self.current_scene = self.scenes[new_scene]
-                self.current_scene.reset()
+                sprite_manager.clear()  # we have some sprites we won't use anymore, so it is best to get rid of them, especially if these sprites are a collection of planet animations ranging in the hundreds of individual frames
+                self.current_scene = self.scenes[new_scene](sprite_manager, sound_manager)
             else:
                 self.leaving = True
 
     def draw_scene(self, *args):
         self.current_scene.draw_scene(*args)
 
-
-scene_manager = SceneManager()
+    def add_scene(self, name, scene):
+        self.scenes.update({name: scene})

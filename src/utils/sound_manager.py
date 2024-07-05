@@ -5,6 +5,7 @@ import pygame as pg
 class SoundManager:
     def __init__(self):
         self.sounds = {}
+        self.volume = 1
 
     def add(self, name, sound, type='singular'):
         if type == 'singular':
@@ -33,6 +34,7 @@ class SoundManager:
             s.stop()
 
     def set_volume(self, volume):
+        self.volume = volume
         for name in self.sounds:
             sound = self.sounds[name]
             if isinstance(sound, list):

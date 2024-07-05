@@ -1,10 +1,10 @@
-from src.utils.texture import Animation
+from src.utils.animation import Animation
 import random
 from math import sqrt, atan2, degrees, cos, sin, radians
 
 
 class CelestialBody(Animation):
-    def __init__(self, position, type, i):
+    def __init__(self, position, type, i, sprite_manager):
         paths = {
             "planet": ['assets/textures/spritesheets/planet1.png',
                        'assets/textures/spritesheets/planet2.png',
@@ -44,21 +44,35 @@ class CelestialBody(Animation):
         }
 
         scales = {
-            "planet": [5, 20],
+            "planet": [5, 20],  # random number in range of [a, b] (in range of a to b)
             "sun": [30, 50],
             "black hole": [100, 120],
             "galaxy": [10, 10]
         }
 
-        scale = random.randint(scales[type][0], scales[type][1])/10
+        path: str = paths[type][i] if i != -1 else random.choice(paths[type])
 
-        path = paths[type][i] if i != -1 else random.choice(paths[type])
+        name = path.split('/')[-1].split('.')[0]
+        if i == 6:
+            sprite_manager.add(name, path, True, (300, 300))
+        else:
+            sprite_manager.add(name, path, True, frame_dimensions[type])
 
-        super().__init__(position, path, frame_dimensions[type], fps[type], scale)
+        super().__init__(position, name, sprite_manager, fps=fps[type])
 
-        self.mass = (scale*100)**3
+        self.scale = random.randint(scales[type][0], scales[type][1]) / 10
+        self.name = name
 
-        self.radius = 50*scale
+        density = {
+            'planet': 1,
+            'sun': 3,
+            'black hole': 10,
+            'galaxy': 1
+        }
+
+        self.mass = (self.scale*100)**3 * density[type]
+
+        self.radius = 50*self.scale
 
         self.type = type
 
@@ -71,7 +85,7 @@ class CelestialBody(Animation):
         scroll = args[1]
         time = args[2]
 
-        super().draw(surf, scroll, angle=time, strength=1)
+        super().draw(surf, scroll, offset=(cos(time)*self.scale, sin(time)*self.scale))
 
     def apply_gravity(self, other_object, dt):
         distance = sqrt((other_object.position.x-self.position.x)**2 + (other_object.position.y-self.position.y)**2)
@@ -90,3 +104,11 @@ class CelestialBody(Animation):
                 else:
                     other_object.position.x = self.position.x - (self.radius + other_object.hitbox_radius)*cos(radians(angle))
                     other_object.position.y = self.position.y + (self.radius + other_object.hitbox_radius)*sin(radians(angle))
+
+                    # unexplained math
+                    A = angle
+                    B = degrees(atan2(other_object.velocity.y, other_object.velocity.x))
+
+                    d = other_object.velocity.magnitude()*cos(radians(90 - B + A))
+                    other_object.velocity.x = d * cos(radians(90 + A))
+                    other_object.velocity.y = d * -sin(radians(90 + A))

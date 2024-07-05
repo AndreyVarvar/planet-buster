@@ -17,7 +17,8 @@ class Slider(Thingy):
                  step: float,
                  description='',
                  desc_with_shadow=False,
-                 shadow_color=(128, 128, 128)):
+                 desc_color=ORANGE,
+                 shadow_color=RED):
         super().__init__(position)
 
         self.rail = pg.Rect(self.position.x-rail_size[0]//2, self.position.y-rail_size[1]//2, rail_size[0], rail_size[1])  # rail rect
@@ -55,9 +56,9 @@ class Slider(Thingy):
         self.clicked = False
 
         if desc_with_shadow:
-            self.description = render_text_with_shadow(2, description, ORANGE, RED)
+            self.description = render_text_with_shadow(2, description, desc_color, shadow_color)
         else:
-            self.description = default_font.render(description, True, ORANGE)
+            self.description = default_font.render(description, True, desc_color)
 
     def update(self, mouse_pos, cursor, sound_manager):
         if not cursor.holding:
