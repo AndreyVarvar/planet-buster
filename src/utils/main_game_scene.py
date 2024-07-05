@@ -79,13 +79,13 @@ class MainGame(Scene):
             enemy.update(dt, self.player.position, self.map_boundaries, scroll, sound_manager, sprite_manager)
 
             if enemy.spawn_laser:  # spawn lasers
-                self.projectiles.append(Projectile(enemy.position, 2, 1000, 20, 180+degrees(atan2(-enemy.position.y+self.player.position.y, enemy.position.x-self.player.position.x)), sound_manager, sprite_manager))
+                self.projectiles.append(Projectile(enemy.position, 2, 1000, 180+degrees(atan2(-enemy.position.y+self.player.position.y, enemy.position.x-self.player.position.x)), sound_manager, sprite_manager))
 
             if enemy.really_dead_and_should_be_destroyed:
                 self.enemies.remove(enemy)
         # spawn lasers
         if self.player.spawn_laser:
-            self.projectiles.append(Projectile(self.player.position, 0, 1000, 100, degrees(atan2(self.player.position.y-mouse_pos[1]-scroll[1]+HEIGHT//2, -self.player.position.x+mouse_pos[0]+scroll[0]-WIDTH//2)), sound_manager, sprite_manager))
+            self.projectiles.append(Projectile(self.player.position, 0, 1000, degrees(atan2(self.player.position.y-mouse_pos[1]-scroll[1]+HEIGHT//2, -self.player.position.x+mouse_pos[0]+scroll[0]-WIDTH//2)), sound_manager, sprite_manager))
 
         # end game when player dies
         if self.player.really_dead:
@@ -125,6 +125,16 @@ class MainGame(Scene):
                 if (planet.radius + 5) >= dist(planet.position, projectile.position):
                     self.projectiles.remove(projectile)
                     continue
+
+            # as well as if the laser hit any other ship
+            for ship in self.enemies:
+                if (dist(projectile.position, ship.position) + 5) <= ship.hitbox_radius and projectile.type != 2:
+                    ship.health_bar.decrease()
+                    self.projectiles.remove(projectile)
+            # player ship
+            if (dist(projectile.position, self.player.position) + 5) <= self.player.hitbox_radius and projectile.type != 0:
+                self.player.health_bar.decrease()
+                self.projectiles.remove(projectile)
 
 
     def scene_thingies_init(self, *args):

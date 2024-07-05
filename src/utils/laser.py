@@ -4,7 +4,7 @@ import pygame as pg
 
 
 class Projectile(Animation):
-    def __init__(self, position, type, speed, power, rotation, sound_manager, sprite_manager, scale=1):
+    def __init__(self, position, type, speed, rotation, sound_manager, sprite_manager, scale=1):
         super().__init__(position, 'laser', sprite_manager, drawing_rotation=90)
         self.texture = self.animation[type]
 
@@ -12,7 +12,6 @@ class Projectile(Animation):
 
         self.type = type
         self.speed = speed
-        self.power = power
         self.rotation = rotation
 
         self.scale = scale

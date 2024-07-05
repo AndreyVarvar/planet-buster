@@ -2,6 +2,7 @@ from src.utils.animation import Animation
 from math import atan2, sin, cos, radians, degrees, sqrt
 import random
 from src.utils.constants import *
+from src.utils.healthbar import HealthBar
 
 
 class Enemy(Animation):
@@ -10,6 +11,8 @@ class Enemy(Animation):
 
         self.hitbox_radius = 50
         self.rotation = 0
+
+        self.health_bar = HealthBar(self.position + pg.Vector2(0, 20), sprite_manager)
 
         self.velocity = pg.Vector2()
         self.acceleration = 10
@@ -40,6 +43,12 @@ class Enemy(Animation):
         super().update(dt)
 
         if not self.dead:
+            # update health bar position
+            self.health_bar.position = self.position + pg.Vector2(0, 50)
+
+            # update enemy state depending on health
+            if self.health_bar.depleted:
+                self.dead = True
 
             # updating the rotation
             target_rotation = 180+degrees(atan2(-self.position.y+player_pos.y, self.position.x-player_pos.x))
@@ -118,7 +127,7 @@ class Enemy(Animation):
 
                 self.playing_animation = True
                 self.rotation = 0
-                super().__init__(self.position, 'explosion', sprite_manager, 5)
+                super().__init__(self.position, 'explosion', sprite_manager, 5, scale=2)
 
             if self.animation_end:
                 self.really_dead_and_should_be_destroyed = True
@@ -128,5 +137,5 @@ class Enemy(Animation):
         surf = args[0]
         scroll = args[1]
         time = args[2]
-        # self.rotation-90, 2, angle=time, strength=1
+        self.health_bar.draw(surf, scroll)
         super().draw(surf, scroll, offset=(cos(time), sin(time)))

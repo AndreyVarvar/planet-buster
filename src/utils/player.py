@@ -2,6 +2,7 @@ from src.utils.animation import Animation
 import pygame as pg
 from math import sin, cos, radians, floor
 from src.utils.constants import *
+from src.utils.healthbar import HealthBar
 import random
 
 
@@ -11,6 +12,8 @@ class Player(Animation):
 
         self.hitbox_radius = 25
         self.rotation = 0
+
+        self.health_bar = HealthBar(self.position+pg.Vector2(0, 20), sprite_manager)
 
         self.velocity = pg.Vector2()
         self.acceleration = 10
@@ -40,6 +43,12 @@ class Player(Animation):
         super().update(dt)
 
         if not self.dead:
+            # update health bar position
+            self.health_bar.position = self.position + pg.Vector2(0, 50)
+
+            # update player state depending on health
+            if self.health_bar.depleted is True:
+                self.dead = True
 
             # updating the rotation
             if keys_pressed[pg.K_LEFT] or keys_pressed[pg.K_a]:
@@ -114,11 +123,13 @@ class Player(Animation):
                 scroll[0] += random.randint(-100, 100)
                 scroll[1] += random.randint(-100, 100)
 
+                self.health_bar.bar_state = 0
                 sound_manager.play('explosion')
 
                 self.playing_animation = True
                 self.rotation = 90
-                super().__init__(self.position, 'explosion', sprite_manager, 5)
+                super().__init__(self.position, 'explosion', sprite_manager, 5, scale=2)
+
             scroll[0] += (-scroll[0]+self.position.x)/20
             scroll[1] += (-scroll[1]+self.position.y)/20
 
@@ -133,4 +144,6 @@ class Player(Animation):
         surf = args[0]
         scroll = args[1]
         time = args[2]
+
+        self.health_bar.draw(surf, scroll)
         super().draw(surf, scroll, offset=(cos(time), sin(time)))

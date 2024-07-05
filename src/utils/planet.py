@@ -101,6 +101,7 @@ class CelestialBody(Animation):
             if distance < (other_object.hitbox_radius + self.radius):
                 if other_object.velocity.magnitude() > 350 or self.type != 'planet':
                     other_object.dead = True
+                    other_object.health_bar.bar_state = 0
                 else:
                     other_object.position.x = self.position.x - (self.radius + other_object.hitbox_radius)*cos(radians(angle))
                     other_object.position.y = self.position.y + (self.radius + other_object.hitbox_radius)*sin(radians(angle))
