@@ -97,7 +97,7 @@ class MainGame(Scene):
         self.planets.append(CelestialBody((1000, 0), 'planet', -1))
 
 
-        self.player = Player((400, 0))
+        self.player = Player((500, 500))
 
         self.enemies = [Enemy((-100, -1000)), Enemy((0, -1000)), Enemy((100, -1000)), Enemy((-100, -1100)), Enemy((0, -1100)), Enemy((100, -1100))]
 

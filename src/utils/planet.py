@@ -56,7 +56,7 @@ class CelestialBody(Animation):
 
         super().__init__(position, path, frame_dimensions[type], fps[type], scale)
 
-        self.mass = (scale*100)**3/100
+        self.mass = (scale*100)**3
 
         self.radius = 50*scale
 
@@ -85,7 +85,7 @@ class CelestialBody(Animation):
             other_object.velocity.y -= force*sin(radians(angle))
 
             if distance < (other_object.hitbox_radius + self.radius):
-                if other_object.velocity.magnitude() > 5 or self.type != 'planet':
+                if other_object.velocity.magnitude() > 350 or self.type != 'planet':
                     other_object.dead = True
                 else:
                     other_object.position.x = self.position.x - (self.radius + other_object.hitbox_radius)*cos(radians(angle))

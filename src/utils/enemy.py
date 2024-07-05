@@ -13,7 +13,7 @@ class Enemy(Animation):
 
         self.velocity = pg.Vector2()
         self.acceleration = 10
-        self.max_speed = 25
+        self.max_speed = 750
 
         self.dead = False
         self.playing_animation = False
@@ -65,17 +65,24 @@ class Enemy(Animation):
             if distance_to_player < 400:
                 self.in_pursuit = True
 
-            if (distance_to_player > 300 and self.in_pursuit) and self.velocity.magnitude() < self.max_speed//2:
+            if distance_to_player > 300 and self.in_pursuit:
                 rotation = random.randint(-100, 100) + self.rotation
-                self.velocity.x += cos(radians(rotation)) * self.acceleration * dt
-                self.velocity.y -= sin(radians(rotation)) * self.acceleration * dt
+
+                additional_velocity = pg.Vector2()
+
+                additional_velocity.x += cos(radians(rotation)) * self.acceleration
+                additional_velocity.y -= sin(radians(rotation)) * self.acceleration
+
+                additional_velocity.clamp_magnitude(max(0, (self.max_speed // 2) - self.velocity.magnitude()))
+
+                self.velocity += additional_velocity
             else:
                 self.velocity /= 1.05
 
             self.velocity = self.velocity.clamp_magnitude(self.max_speed)
 
-            self.position[0] += self.velocity.x
-            self.position[1] += self.velocity.y
+            self.position[0] += self.velocity.x * dt
+            self.position[1] += self.velocity.y * dt
 
             # spawning lasers
             if distance_to_player < 500 and self.laser_cooldown < 0 and self.in_pursuit:
