@@ -7,6 +7,7 @@ from src.utils.game_files.planet import CelestialBody
 from src.utils.utilities import *
 from src.utils.game_files.crosshair import CrossHair
 from src.utils.game_files.radar import Radar
+from src.utils.game_files.map_generator import generate_map
 import random
 # here lies the massive scene that is out game
 
@@ -238,12 +239,7 @@ class MainGame(Scene):
 
         self.crosshair = CrossHair((0, 0), sprite_manager)
 
-        self.planets = []
-        self.planets.append(CelestialBody((0, 0), 'sun', -1, sprite_manager))
-        self.planets.append(CelestialBody((1000, 1000), 'gas giant', -1, sprite_manager))
-        self.planets.append(CelestialBody((0, 1000), 'planet', -1, sprite_manager))
-        self.planets.append(CelestialBody((-1000, 1000), 'planet', -1, sprite_manager))
-        self.planets.append(CelestialBody((1000, 0), 'planet', -1, sprite_manager))
+        self.planets = generate_map(sprite_manager, 0)
 
 
         self.player = Player((0, -1500), sprite_manager)
