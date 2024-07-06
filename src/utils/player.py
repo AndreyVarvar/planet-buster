@@ -16,7 +16,7 @@ class Player(Animation):
         self.health_bar = HealthBar(self.position+pg.Vector2(0, 20), sprite_manager)
 
         self.velocity = pg.Vector2()
-        self.acceleration = 10
+        self.acceleration = 500
         self.max_speed = 700
 
         self.dead = False
@@ -24,6 +24,8 @@ class Player(Animation):
         self.really_dead = False
 
         self.spawn_laser = False
+        self.target_locked = False
+        self.target = None
 
         self.angular_velocity = 180  # degrees per sec
 
@@ -61,8 +63,8 @@ class Player(Animation):
             if keys_pressed[pg.K_UP] or keys_pressed[pg.K_w]:
                 additional_velocity = pg.Vector2()
 
-                additional_velocity.x += cos(radians(self.rotation))*self.acceleration
-                additional_velocity.y -= sin(radians(self.rotation))*self.acceleration
+                additional_velocity.x += cos(radians(self.rotation))*self.acceleration * dt
+                additional_velocity.y -= sin(radians(self.rotation))*self.acceleration * dt
 
                 additional_velocity.clamp_magnitude(max(0, (self.max_speed//2)-self.velocity.magnitude()))
 

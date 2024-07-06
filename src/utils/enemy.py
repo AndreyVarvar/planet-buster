@@ -43,6 +43,7 @@ class Enemy(Animation):
         super().update(dt)
 
         if not self.dead:
+            # self.in_pursuit = False
             # update health bar position
             self.health_bar.position = self.position + pg.Vector2(0, 50)
 
@@ -97,7 +98,7 @@ class Enemy(Animation):
             # spawning lasers
             if distance_to_player < 500 and self.laser_cooldown < 0 and self.in_pursuit:
                 self.spawn_laser = True
-                self.laser_cooldown = self.cd + random.randint(0, 3000)/1000
+                self.laser_cooldown = self.cd + random.randint(0, 1000)/1000
             else:
                 self.spawn_laser = False
                 self.laser_cooldown -= dt

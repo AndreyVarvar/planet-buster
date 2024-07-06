@@ -12,11 +12,12 @@ class CelestialBody(Animation):
                        'assets/textures/spritesheets/planet4.png',
                        'assets/textures/spritesheets/planet5.png',
                        'assets/textures/spritesheets/planet6.png',
-                       'assets/textures/spritesheets/planet7.png',
                        'assets/textures/spritesheets/planet8.png',
                        'assets/textures/spritesheets/planet9.png',
                        'assets/textures/spritesheets/planet10.png'
                        ],
+
+            "gas giant": ['assets/textures/spritesheets/planet7.png'],
 
             "sun": ['assets/textures/spritesheets/sun1.png',
                     'assets/textures/spritesheets/sun2.png',
@@ -32,6 +33,7 @@ class CelestialBody(Animation):
         frame_dimensions = {
             "planet": (100, 100),
             "sun": (200, 200),
+            "gas giant": (300, 300),
             "black hole": (200, 200),
             "galaxy": (100, 100)
         }
@@ -39,6 +41,7 @@ class CelestialBody(Animation):
         fps = {
             "planet": 10,
             "sun": 2,
+            "gas giant": 10,
             "black_hole": 20,
             "galaxy": 5
         }
@@ -46,6 +49,7 @@ class CelestialBody(Animation):
         scales = {
             "planet": [5, 20],  # random number in range of [a, b] (in range of a to b)
             "sun": [30, 50],
+            "gas giant": [10, 25],
             "black hole": [100, 120],
             "galaxy": [10, 10]
         }
@@ -65,8 +69,9 @@ class CelestialBody(Animation):
 
         density = {
             'planet': 1,
-            'sun': 3,
-            'black hole': 10,
+            "gas giant": 0.5,
+            'sun': 2,
+            'black hole': 3,
             'galaxy': 1
         }
 
