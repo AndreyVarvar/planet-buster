@@ -1,8 +1,7 @@
 from src.utils.animation import Animation
-import pygame as pg
 from math import sin, cos, radians, floor
 from src.utils.constants import *
-from src.utils.healthbar import HealthBar
+from src.utils.game_files.healthbar import HealthBar
 import random
 
 

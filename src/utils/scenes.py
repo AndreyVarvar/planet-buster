@@ -34,7 +34,7 @@ class MainMenu(Scene):
 
         self.time += dt
 
-        background.position = pg.Vector2(background.position.x, background.position.y + 2)
+        background.position = pg.Vector2(background.position.x, background.position.y + 200*dt)
 
         self.button1.update(mouse_pos, cursor, sound_manager)
         self.button2.update(mouse_pos, cursor, sound_manager)
@@ -89,6 +89,7 @@ class Settings(Scene):
 
         mouse_pos = args[0]  # just for clarity
         cursor = args[1]
+        dt = args[2]
         sound_manager = args[5]
         background = args[6]
 
@@ -97,7 +98,7 @@ class Settings(Scene):
         self.slider1.update(mouse_pos, cursor, sound_manager)
         sound_manager.set_volume(self.slider1.value)
 
-        background.position = pg.Vector2(background.position.x, background.position.y + self.slider1.value*10 + 1)
+        background.position = pg.Vector2(background.position.x, background.position.y + dt*100*(self.slider1.value*10 + 1))
 
         self.slider2.update(mouse_pos, cursor, sound_manager)
 

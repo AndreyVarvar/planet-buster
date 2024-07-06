@@ -1,18 +1,19 @@
 from src.utils.scene import Scene
-from src.utils.constants import *
 from math import atan2, degrees, dist
-from src.utils.player import Player
-from src.utils.laser import Projectile
-from src.utils.enemy import Enemy
-from src.utils.planet import CelestialBody
+from src.utils.game_files.player import Player
+from src.utils.game_files.laser import Projectile
+from src.utils.game_files.enemy import Enemy
+from src.utils.game_files.planet import CelestialBody
 from src.utils.utilities import *
-from src.utils.crosshair import CrossHair
+from src.utils.game_files.crosshair import CrossHair
+from src.utils.game_files.radar import Radar
 import random
 # here lies the massive scene that is out game
 
 
 class MainGame(Scene):
     def __init__(self, *args):
+        sprite_manager = args[0]
         super().__init__(MAIN_GAME, *args)
 
         self.map_boundaries = pg.Rect(-10_000, -10_000, 20_000, 20_000)
@@ -24,6 +25,7 @@ class MainGame(Scene):
         self.fps_update_rate = 1  # every second
         self.last_fps_update = 0
         self.last_fps_value = 100
+        self.radar = Radar(self.player.position, sprite_manager)
 
         self.game_end = False
 
@@ -51,6 +53,9 @@ class MainGame(Scene):
         if self.player.target_locked:
             self.crosshair.draw(surf, scroll)
 
+        # draw the radar
+        self.radar.draw(surf, scroll, offset=pg.Vector2(WIDTH//2 - 140, -HEIGHT//2 + 140))
+
         # draw other stuff
         surf.blit(render_text_with_shadow(2, f'POSITION: [{round(self.player.position.x/10)}, {round(self.player.position.y/10)}]'), (10, 10))
         # update fps
@@ -75,6 +80,7 @@ class MainGame(Scene):
         self.time += dt
 
         # obvious updates
+        self.update_radar(*args)
         self.update_planets(*args)
         self.update_crosshair(*args)
         self.update_player(*args)
@@ -84,6 +90,11 @@ class MainGame(Scene):
         # update the background according to the scroll
         background.position = -pg.Vector2(scroll)
 
+    def update_radar(self, *args):
+        scroll = args[3]
+        sprite_manager = args[7]
+        self.radar.position = pg.Vector2(scroll)
+        self.radar.update(self.player, self.planets, self.enemies, sprite_manager, pg.Vector2(WIDTH//2 - 140, -HEIGHT//2 + 140))
 
     def update_crosshair(self, *args):
         mouse_pos = args[0]
@@ -100,7 +111,7 @@ class MainGame(Scene):
                 if dist(mouse_pos_in_world, enemy.position) < dist(mouse_pos_in_world, closest_enemy.position) and enemy.dead is False:
                     closest_enemy = enemy
 
-            if dist(mouse_pos_in_world, closest_enemy.position) < 100:
+            if dist(mouse_pos_in_world, closest_enemy.position) < 100 and self.player.dead is False:
                 self.player.target_locked = True
                 self.player.target = closest_enemy
                 self.crosshair.position = closest_enemy.position
@@ -120,7 +131,8 @@ class MainGame(Scene):
             enemy.update(dt, self.player.position, self.map_boundaries, scroll, sound_manager, sprite_manager)
 
             if enemy.spawn_laser and enemy.dead is False:  # spawn lasers
-                self.projectiles.append(Projectile(enemy.position, 2, 1000, 180 + degrees(atan2(-enemy.position.y + self.player.position.y, enemy.position.x - self.player.position.x)), sound_manager, sprite_manager))
+                projectile_angle = calculate_shoot_angle(enemy, 1000, self.player) + random.randint(-5, 5)
+                self.projectiles.append(Projectile(enemy.position, 2, 1000, projectile_angle, sound_manager, sprite_manager))
 
             if enemy.really_dead_and_should_be_destroyed:
                 self.enemies.remove(enemy)

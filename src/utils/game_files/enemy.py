@@ -2,7 +2,7 @@ from src.utils.animation import Animation
 from math import atan2, sin, cos, radians, degrees, sqrt
 import random
 from src.utils.constants import *
-from src.utils.healthbar import HealthBar
+from src.utils.game_files.healthbar import HealthBar
 
 
 class Enemy(Animation):
@@ -138,5 +138,6 @@ class Enemy(Animation):
         surf = args[0]
         scroll = args[1]
         time = args[2]
-        self.health_bar.draw(surf, scroll)
+        if self.in_pursuit:
+            self.health_bar.draw(surf, scroll)
         super().draw(surf, scroll, offset=(cos(time), sin(time)))
