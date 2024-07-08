@@ -31,8 +31,11 @@ class MainMenu(Scene):
         dt = args[2]
         sound_manager = args[5]
         background = args[6]
+        music_manager = args[8]
 
         self.time += dt
+
+        music_manager.play('intro')
 
         background.position = pg.Vector2(background.position.x, background.position.y + 200*dt)
 
@@ -92,6 +95,9 @@ class Settings(Scene):
         dt = args[2]
         sound_manager = args[5]
         background = args[6]
+        music_manager = args[8]
+
+        music_manager.play('intro')
 
         self.button1.update(mouse_pos, cursor, sound_manager)
 
@@ -99,6 +105,7 @@ class Settings(Scene):
         sound_manager.set_volume(self.slider1.value)
 
         background.position = pg.Vector2(background.position.x, background.position.y + dt*100*(self.slider1.value*10 + 1))
+        music_manager.set_volume(self.slider2.value)
 
         self.slider2.update(mouse_pos, cursor, sound_manager)
 
@@ -109,6 +116,7 @@ class Settings(Scene):
     def scene_thingies_init(self, *args):
         sprite_manager = args[0]
         sound_manager = args[1]
+        music_manager = args[2]
 
         sprite_manager.add('button outline', 'assets/textures/UI/button_outline.png')
         sprite_manager.add('button outline on hover', 'assets/textures/UI/button_outline_hover.png')
@@ -119,5 +127,5 @@ class Settings(Scene):
         self.button1 = Button((500, 100), (400, 80), text='back', font=default_font, texture=button_outline, hover_texture=button_outline_hovered, text_color=ORANGE, text_with_shadow=True, shadow_color=RED)
 
         self.slider1 = Slider((500, 300), (400, 30), (50, 50), 0, 1, sound_manager.volume, 0.05, 'sfx volume', desc_with_shadow=True, shadow_color=RED)
-        self.slider2 = Slider((500, 450), (400, 30), (50, 50), 0, 1, 1, 0.1, 'music volume', desc_with_shadow=True, shadow_color=RED)
+        self.slider2 = Slider((500, 450), (400, 30), (50, 50), 0, 1, music_manager.volume, 0.1, 'music volume', desc_with_shadow=True, shadow_color=RED)
 

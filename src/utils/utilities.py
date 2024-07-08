@@ -32,7 +32,7 @@ def calculate_shoot_angle(shooter, projectile_speed, target):
     alpha = atan2(y1-y2, x1-x2) - beta
 
     # angle between the expected trajectory of the projectile and the vector from shooter to target
-    x = asin(v2.length()/v1 * sin(alpha))
+    x = asin(min(1, v2.length()/v1 * sin(alpha)))
 
     projectile_angle = x + atan2(y2-y1, x2-x1)
 

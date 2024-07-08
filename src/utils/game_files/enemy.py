@@ -15,7 +15,7 @@ class Enemy(Animation):
         self.health_bar = HealthBar(self.position + pg.Vector2(0, 20), sprite_manager)
 
         self.velocity = pg.Vector2()
-        self.acceleration = 10
+        self.acceleration = 500
         self.max_speed = 750
 
         self.dead = False
@@ -81,8 +81,8 @@ class Enemy(Animation):
 
                 additional_velocity = pg.Vector2()
 
-                additional_velocity.x += cos(radians(rotation)) * self.acceleration
-                additional_velocity.y -= sin(radians(rotation)) * self.acceleration
+                additional_velocity.x += cos(radians(rotation)) * self.acceleration * dt
+                additional_velocity.y -= sin(radians(rotation)) * self.acceleration * dt
 
                 additional_velocity.clamp_magnitude(max(0, (self.max_speed // 2) - self.velocity.magnitude()))
 

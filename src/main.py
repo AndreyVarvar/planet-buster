@@ -4,6 +4,7 @@ from src.utils.cursor import Cursor
 
 # managers
 from src.utils.sound_manager import SoundManager
+from src.utils.music_manager import MusicManager
 from src.utils.scene_manager import SceneManager  # crazy namings
 from src.utils.sprite_manager import SpriteManager
 
@@ -29,8 +30,13 @@ class Game:
         self.sound_manager.add('ui-slider-slide', pg.mixer.Sound('assets/sfx/slider_slide.wav'))
         self.sound_manager.add('laser-fired', pg.mixer.Sound('assets/sfx/laser.wav'))
         self.sound_manager.add('hurt', pg.mixer.Sound('assets/sfx/hurt.wav'))
+        self.sound_manager.add('whoosh', pg.mixer.Sound('assets/sfx/whoosh.wav'))
 
         self.sound_manager.set_volume(0.33)
+
+        # setting up music manager
+        self.music_manager = MusicManager()
+        self.music_manager.add('intro', 'assets/music/intro.wav')
 
         # setting up sprite manager
         self.sprite_manager = SpriteManager()
@@ -81,7 +87,7 @@ class Game:
         pg.display.update()
 
     def update(self):
-        self.scene_manager.update(pg.mouse.get_pos(), self.cursor, self.dt, self.scroll, pg.key.get_pressed(), self.sound_manager, self.background, self.sprite_manager)
+        self.scene_manager.update(pg.mouse.get_pos(), self.cursor, self.dt, self.scroll, pg.key.get_pressed(), self.sound_manager, self.background, self.sprite_manager, self.music_manager)
 
         self.cursor.update(pg.mouse.get_pressed())
 

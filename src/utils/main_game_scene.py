@@ -132,7 +132,7 @@ class MainGame(Scene):
             enemy.update(dt, self.player.position, self.map_boundaries, scroll, sound_manager, sprite_manager)
 
             if enemy.spawn_laser and enemy.dead is False:  # spawn lasers
-                projectile_angle = calculate_shoot_angle(enemy, 1000, self.player) + random.randint(-5, 5)
+                projectile_angle = calculate_shoot_angle(enemy, 1000, self.player) + random.randint(-10, 10)
                 self.projectiles.append(Projectile(enemy.position, 2, 1000, projectile_angle, sound_manager, sprite_manager))
 
             if enemy.really_dead_and_should_be_destroyed:
@@ -239,7 +239,7 @@ class MainGame(Scene):
 
         self.crosshair = CrossHair((0, 0), sprite_manager)
 
-        self.planets = generate_map(sprite_manager, 0)
+        self.planets = generate_map(sprite_manager, 1)
 
 
         self.player = Player((0, -1500), sprite_manager)

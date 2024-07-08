@@ -10,6 +10,7 @@ class SceneManager:
     def update(self, *args):
         sound_manager = args[5]
         sprite_manager = args[7]
+        music_manager = args[8]
 
         self.current_scene.update(*args)
 
@@ -21,7 +22,7 @@ class SceneManager:
                 self.current_scene.change_to = None
 
                 sprite_manager.clear()  # we have some sprites we won't use anymore, so it is best to get rid of them, especially if these sprites are a collection of planet animations ranging in the hundreds of individual frames
-                self.current_scene = self.scenes[new_scene](sprite_manager, sound_manager)
+                self.current_scene = self.scenes[new_scene](sprite_manager, sound_manager, music_manager)
             else:
                 self.leaving = True
 

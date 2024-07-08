@@ -42,3 +42,4 @@ class SoundManager:
                     s.set_volume(volume)
             else:
                 sound.set_volume(volume)
+
