@@ -32,6 +32,8 @@ class Game:
         self.sound_manager.add('hurt', pg.mixer.Sound('assets/sfx/hurt.wav'))
         self.sound_manager.add('planet explosion', pg.mixer.Sound('assets/sfx/planet_explosing.wav'))
         self.sound_manager.add('whoosh', pg.mixer.Sound('assets/sfx/whoosh.wav'))
+        self.sound_manager.add('thrust', pg.mixer.Sound('assets/sfx/thrust.wav'))
+
 
         self.sound_manager.set_volume(0.33)
 
@@ -59,6 +61,8 @@ class Game:
         self.scroll = [0, 0]
 
         self.clock = pg.time.Clock()
+
+        self.difficulty = 0
 
         self.cursor = Cursor()
 

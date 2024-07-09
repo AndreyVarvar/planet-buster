@@ -66,6 +66,9 @@ class MainGame(Scene):
         # draw the radar
         self.radar.draw(surf, scroll, offset=pg.Vector2(WIDTH//2 - 140, -HEIGHT//2 + 140))
 
+        # draw planet descriptor
+        self.planet_description.draw(surf, scroll, offset=pg.Vector2(WIDTH//2 - 140, -HEIGHT//2 + 650))
+
         self.draw_special_text(surf, dt, self.player)
 
     def update(self, *args):
@@ -83,8 +86,21 @@ class MainGame(Scene):
             self.last_fps_update -= self.fps_update_rate
         self.last_fps_update += dt
 
+        # check current state
+        for planet in self.planets:
+            if planet.target:
+                target = planet
+                break
+
+        if target.exploded and target.animation_end and not self.mission_failed:
+            self.change_scene = True
+            self.change_to = MAIN_MENU
+
         # update the time, which is used to make some object move by using sin and cos
         self.time += dt
+
+        # update descriptor
+        self.planet_description.position = pg.Vector2(scroll)
 
         # obvious updates
         self.update_radar(*args)
@@ -111,6 +127,7 @@ class MainGame(Scene):
         elif self.player.fire_planet_buster and self.player.used_the_only_attempt is False:
             self.player.used_the_only_attempt = True
             self.planet_buster = PlanetBuster(self.player.position, sprite_manager)
+            sound_manager.play('thrust', loop=-1)
 
             # get the target
             closest_planet = self.planets[1]
@@ -124,6 +141,7 @@ class MainGame(Scene):
         if self.planet_buster is not None:
             for planet in self.planets:
                 if dist(self.planet_buster.position, planet.position) <= (planet.radius+10):
+                    sound_manager.stop('thrust')
                     self.planet_buster = None
                     planet.destroyed = True
                     self.end_of_mission = True
@@ -136,7 +154,7 @@ class MainGame(Scene):
         scroll = args[3]
         sprite_manager = args[7]
         self.radar.position = pg.Vector2(scroll)
-        self.radar.update(self.player, self.planets, self.enemies, sprite_manager, pg.Vector2(WIDTH//2 - 140, -HEIGHT//2 + 140))
+        self.radar.update(self.player, self.planets, self.enemies, sprite_manager)
 
     def update_crosshair(self, *args):
         mouse_pos = args[0]
@@ -267,11 +285,12 @@ class MainGame(Scene):
         sprite_manager.add('laser', 'assets/textures/spritesheets/laser.png', True,  (32, 32))
         sprite_manager.add('crosshair', 'assets/textures/sprites/crosshair.png')
         sprite_manager.add('planet buster', 'assets/textures/sprites/planet_buster.png')
-        sprite_manager.add('planet exploding', 'assets/textures/spritesheets/exploding_planet.png', True, (96, 96))
+        sprite_manager.add('planet exploding', 'assets/textures/spritesheets/planets/exploding_planet.png', True, (96, 96))
+        sprite_manager.add('planet descriptor', 'assets/textures/sprites/planet_descriptor_panel.png')
 
         self.crosshair = CrossHair((0, 0), sprite_manager)
 
-        self.planets = generate_map(sprite_manager, 1)
+        self.planets, self.planet_description = generate_map(sprite_manager, 1)
 
         self.player = Player((0, -1500), sprite_manager)
 
@@ -313,3 +332,7 @@ class MainGame(Scene):
                 surf.blit(render_text_with_shadow(2, f'[MISSION FAILED]', colour=RED, drop_colour=DARK_RED), (10, 130))
             else:
                 surf.blit(render_text_with_shadow(2, f'[MISSION SUCCESSFUL]', colour=GREEN, drop_colour=DARK_GREEN), (10, 130))
+
+        # draw text related to target planet descriptor
+        surf.blit(render_text_with_shadow(2, f'[TARGET:]'), (750, 500))
+        surf.blit(render_text_with_shadow(2, f'[PLANET: {self.planet_description.planet_number}]'), (730, 750))

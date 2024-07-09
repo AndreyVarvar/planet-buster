@@ -1,5 +1,6 @@
 from src.utils.game_files.planet import CelestialBody
 from math import *
+from src.utils.game_files.planet_descriptor import Descriptor
 import random
 
 
@@ -19,7 +20,7 @@ def generate_map(sprite_manager, difficulty):
         rotation_speed = random.randint(planet_count//(i+1), planet_count//(i+1) + 1)/10  # the farther away, the slower the planet
         scale = random.randint(i//10+1, i//5+1)
 
-        planet_type = 'planet' if (planet_count - i) > planet_count//2 else 'gas giant'
+        planet_type = random.choice(['planet', 'gas giant'])
 
         planets.append(CelestialBody(planet_pos, planet_type, -1, sprite_manager, distance_from_center, degrees(random_rotation), rotation_speed, scale))  # the SUN
 
@@ -27,4 +28,8 @@ def generate_map(sprite_manager, difficulty):
     target = random.randint(0, planet_count-1) + 1  # add 1 to exclude the sun from being assigned as a target
     planets[target].target = True
 
-    return planets
+
+
+    planet_description = Descriptor((0, 0), sprite_manager, planets[target].texture, target)
+
+    return planets, planet_description

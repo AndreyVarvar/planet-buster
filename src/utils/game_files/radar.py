@@ -9,7 +9,7 @@ class Radar(Thingy):
 
         super().__init__(position, sprite_manager.sprites['radar'], scale=4)
 
-    def update(self, player, planets, enemies, sprite_manager, offset):
+    def update(self, player, planets, enemies, sprite_manager):
         self.texture = sprite_manager.sprites['radar'].copy()
 
         # first draw all the planets on the radar

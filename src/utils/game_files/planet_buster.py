@@ -12,6 +12,7 @@ class PlanetBuster(Thingy):
         self.max_velocity = 400
 
     def update(self, dt):
+
         self.velocity += self.acceleration*dt
         self.velocity = min(self.velocity, self.max_velocity)
 

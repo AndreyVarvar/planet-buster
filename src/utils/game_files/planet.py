@@ -7,28 +7,43 @@ import pygame as pg
 class CelestialBody(Animation):
     def __init__(self, position, type, i, sprite_manager, distance_from_center, revolution_angle, revolution_speed, scale=-1, target=False):
         paths = {
-            "planet": ['assets/textures/spritesheets/planet1.png',
-                       'assets/textures/spritesheets/planet2.png',
-                       'assets/textures/spritesheets/planet3.png',
-                       'assets/textures/spritesheets/planet4.png',
-                       'assets/textures/spritesheets/planet5.png',
-                       'assets/textures/spritesheets/planet6.png',
-                       'assets/textures/spritesheets/planet8.png',
-                       'assets/textures/spritesheets/planet9.png',
-                       'assets/textures/spritesheets/planet10.png'
+            "planet": ['assets/textures/spritesheets/planets/planet1.png',
+                       'assets/textures/spritesheets/planets/planet2.png',
+                       'assets/textures/spritesheets/planets/planet3.png',
+                       'assets/textures/spritesheets/planets/planet4.png',
+                       'assets/textures/spritesheets/planets/planet5.png',
+                       'assets/textures/spritesheets/planets/planet6.png',
+                       'assets/textures/spritesheets/planets/planet8.png',
+                       'assets/textures/spritesheets/planets/planet9.png',
+                       'assets/textures/spritesheets/planets/planet10.png',
+                       'assets/textures/spritesheets/planets/planet101.png',
+                       'assets/textures/spritesheets/planets/planet102.png',
+                       'assets/textures/spritesheets/planets/planet103.png',
+                       'assets/textures/spritesheets/planets/planet104.png',
+                       'assets/textures/spritesheets/planets/planet105.png',
+                       'assets/textures/spritesheets/planets/planet106.png',
+                       'assets/textures/spritesheets/planets/planet107.png',
+                       'assets/textures/spritesheets/planets/planet108.png',
+                       'assets/textures/spritesheets/planets/planet109.png',
+                       'assets/textures/spritesheets/planets/planet110.png'
                        ],
 
-            "gas giant": ['assets/textures/spritesheets/planet7.png'],
+            "gas giant": ['assets/textures/spritesheets/planets/planet7.png',
+                          'assets/textures/spritesheets/planets/planet111.png',
+                          'assets/textures/spritesheets/planets/planet112.png',
+                          'assets/textures/spritesheets/planets/planet113.png',
+                          'assets/textures/spritesheets/planets/planet114.png',
+                          'assets/textures/spritesheets/planets/planet115.png',],
 
-            "sun": ['assets/textures/spritesheets/sun1.png',
-                    'assets/textures/spritesheets/sun2.png',
-                    'assets/textures/spritesheets/sun3.png',
-                    'assets/textures/spritesheets/sun4.png'
+            "sun": ['assets/textures/spritesheets/planets/sun1.png',
+                    'assets/textures/spritesheets/planets/sun2.png',
+                    'assets/textures/spritesheets/planets/sun3.png',
+                    'assets/textures/spritesheets/planets/sun4.png'
                     ],
 
-            "galaxy": ['assets/textures/spritesheets/galaxy.png'],
+            "galaxy": ['assets/textures/spritesheets/planets/galaxy.png'],
 
-            "black hole": ['assets/textures/spritesheets/black_hole.png']
+            "black hole": ['assets/textures/spritesheets/planets/black_hole.png']
         }
 
         frame_dimensions = {
@@ -101,7 +116,7 @@ class CelestialBody(Animation):
         self.position.y = self.distance_from_center*sin(radians(self.revolution_angle))
 
         if self.destroyed and self.exploded is False:
-            super().__init__(self.position, 'planet exploding', sprite_manager, 2, self.radius/32)
+            super().__init__(self.position, 'planet exploding', sprite_manager, 3, self.radius/32)
             self.exploded = True
 
         if self.animation_end and self.exploded:

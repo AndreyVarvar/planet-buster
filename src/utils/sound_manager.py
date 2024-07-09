@@ -16,13 +16,13 @@ class SoundManager:
                 self.sounds[name].append(s)
 
 
-    def play(self, sound):
+    def play(self, sound, loop=0):
         s = self.sounds[sound]
 
         if isinstance(s, list):
-            choice(s).play()
+            choice(s).play(loops=loop)
         else:
-            s.play()
+            s.play(loops=loop)
 
     def stop(self, sound):
         s = self.sounds[sound]
