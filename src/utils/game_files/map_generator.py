@@ -11,7 +11,7 @@ def generate_map(sprite_manager, difficulty):
         planets.append(CelestialBody((0, 0), 'black hole', -1, sprite_manager, 0, 0, 0))  # the SUN
 
     # depending on difficulty add more planets
-    planet_count = random.randint(10, min(15, 10+difficulty))
+    planet_count = 10
     for i in range(planet_count):
         random_rotation = radians(random.randint(0, 360))
         distance_from_center = (i+1)*(10_000/(planet_count+1))

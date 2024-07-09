@@ -33,7 +33,7 @@ class Button(Thingy):
         if self.rect.collidepoint(mouse_pos) and not self.hovered:  # update the button
             self.hovered = True
 
-            sound_manager.play('ui-button-hover')
+            # sound_manager.play('ui-button-hover')
 
         elif not self.rect.collidepoint(mouse_pos):
             self.hovered = False

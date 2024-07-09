@@ -12,5 +12,5 @@ class CrossHair(Thingy):
 
     def update(self, dt, sprite_manager):
         self.time += dt*40
-
         self.texture = pg.transform.rotate(pg.transform.scale_by(sprite_manager.sprites['crosshair'], cos(self.time/10)/4+2), self.time)
+

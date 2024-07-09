@@ -88,6 +88,9 @@ class MainGame(Scene):
         self.update_enemies(*args)
         self.update_projectiles(*args)
 
+        # check if planet buster is called on
+
+
         # update the background according to the scroll
         background.position = -pg.Vector2(scroll)
 
@@ -244,10 +247,14 @@ class MainGame(Scene):
 
         self.player = Player((0, -1500), sprite_manager)
 
-        self.enemies = [Enemy((-100, -1000), sprite_manager),
-                        Enemy((0, -1000), sprite_manager),
-                        Enemy((100, -1000), sprite_manager),
-                        Enemy((-100, -1100), sprite_manager),
-                        Enemy((0, -1100), sprite_manager),
-                        Enemy((100, -1100), sprite_manager)]
+        self.enemies = [Enemy((0, -1100), sprite_manager),
+                        Enemy((50, -1100), sprite_manager),
+                        Enemy((100, -1100), sprite_manager),
+                        Enemy((150, -1100), sprite_manager),
+                        Enemy((200, -1100), sprite_manager),
+                        Enemy((250, -1100), sprite_manager),
+                        Enemy((300, -1100), sprite_manager),
+                        Enemy((350, -1100), sprite_manager),
+                        Enemy((400, -1100), sprite_manager),
+                        Enemy((450, -1100), sprite_manager),]
 
