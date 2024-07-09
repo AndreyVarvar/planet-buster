@@ -3,11 +3,11 @@ from math import atan2, degrees, dist
 from src.utils.game_files.player import Player
 from src.utils.game_files.laser import Projectile
 from src.utils.game_files.enemy import Enemy
-from src.utils.game_files.planet import CelestialBody
 from src.utils.utilities import *
 from src.utils.game_files.crosshair import CrossHair
 from src.utils.game_files.radar import Radar
 from src.utils.game_files.map_generator import generate_map
+from src.utils.game_files.planet_buster import PlanetBuster
 import random
 # here lies the massive scene that is out game
 
@@ -19,9 +19,14 @@ class MainGame(Scene):
 
         self.map_boundaries = pg.Rect(-10_000, -10_000, 20_000, 20_000)
 
+        self.planet_buster = None
+
         self.time = 0
 
         self.projectiles = []
+
+        self.mission_failed = False
+        self.end_of_mission = False
 
         self.fps_update_rate = 1  # every second
         self.last_fps_update = 0
@@ -47,6 +52,10 @@ class MainGame(Scene):
         for enemy in self.enemies:
             enemy.draw(surf, scroll, self.time)
 
+        # draw planet buster
+        if self.planet_buster is not None:
+            self.planet_buster.draw(surf, scroll)
+
         # draw the player
         self.player.draw(surf, scroll, self.time)
 
@@ -57,18 +66,14 @@ class MainGame(Scene):
         # draw the radar
         self.radar.draw(surf, scroll, offset=pg.Vector2(WIDTH//2 - 140, -HEIGHT//2 + 140))
 
-        # draw other stuff
-        surf.blit(render_text_with_shadow(2, f'POSITION: [{round(self.player.position.x/10)}, {round(self.player.position.y/10)}]'), (10, 10))
-        # update fps
-        if self.last_fps_update > self.fps_update_rate:
-            self.last_fps_value = round(1/dt)
-        surf.blit(render_text_with_shadow(2, f'FPS: [{self.last_fps_value}]'), (10, 50))
+        self.draw_special_text(surf, dt, self.player)
 
     def update(self, *args):
         cursor = args[1]
         dt = args[2]
         scroll = args[3]
         background = args[6]
+        sprite_manager = args[7]
 
         cursor.set_cursor(pg.SYSTEM_CURSOR_CROSSHAIR)
 
@@ -89,10 +94,40 @@ class MainGame(Scene):
         self.update_projectiles(*args)
 
         # check if planet buster is called on
-
+        self.deploy_planet_buster(sprite_manager, dt)
 
         # update the background according to the scroll
         background.position = -pg.Vector2(scroll)
+
+    def deploy_planet_buster(self, *args):
+        sprite_manager = args[0]
+        dt = args[1]
+
+        # make planet buster if called, otherwise just update
+        if self.planet_buster is not None:
+            self.planet_buster.update(dt)
+        elif self.player.fire_planet_buster and self.player.used_the_only_attempt is False:
+            self.player.used_the_only_attempt = True
+            self.planet_buster = PlanetBuster(self.player.position, sprite_manager)
+
+            # get the target
+            closest_planet = self.planets[1]
+            for planet in self.planets[1:]:
+                if dist(self.planet_buster.position, planet.position) < dist(self.planet_buster.position, closest_planet.position):
+                    closest_planet = planet
+
+            self.planet_buster.target = closest_planet
+
+        # check any collisions
+        if self.planet_buster is not None:
+            for planet in self.planets:
+                if dist(self.planet_buster.position, planet.position) <= (planet.radius+10):
+                    self.planet_buster = None
+                    planet.destroyed = True
+                    self.end_of_mission = True
+                    if not planet.target:
+                        self.mission_failed = True
+                    break
 
     def update_radar(self, *args):
         scroll = args[3]
@@ -105,24 +140,9 @@ class MainGame(Scene):
         dt = args[2]
         scroll = args[3]
         sprite_manager = args[7]
+
         # update the crosshair
-        self.crosshair.update(dt, sprite_manager)
-
-        if len(self.enemies) > 0:
-            closest_enemy = self.enemies[0]
-            mouse_pos_in_world = pg.Vector2(mouse_pos) + pg.Vector2(scroll) - pg.Vector2(WIDTH//2, HEIGHT//2)
-            for enemy in self.enemies:
-                if dist(mouse_pos_in_world, enemy.position) < dist(mouse_pos_in_world, closest_enemy.position) and enemy.dead is False:
-                    closest_enemy = enemy
-
-            if dist(mouse_pos_in_world, closest_enemy.position) < 100 and self.player.dead is False:
-                self.player.target_locked = True
-                self.player.target = closest_enemy
-                self.crosshair.position = closest_enemy.position
-            else:
-                self.player.target_locked = False
-                self.player.target = None
-                self.crosshair.position = (-100, -100)
+        self.crosshair.update(dt, self.player, self.enemies, self.planets, mouse_pos, scroll, sprite_manager)
 
     def update_enemies(self, *args):
         dt = args[2]
@@ -151,7 +171,7 @@ class MainGame(Scene):
         sprite_manager = args[7]
 
         # update the player
-        self.player.update(dt, mouse_pos, scroll, keys_pressed, cursor, self.map_boundaries, sound_manager, sprite_manager)
+        self.player.update(dt, mouse_pos, scroll, keys_pressed, cursor, self.map_boundaries, sound_manager, sprite_manager, self.crosshair)
         # spawn lasers
         if self.player.spawn_laser and self.player.dead is False:
             if self.player.target_locked:
@@ -239,6 +259,8 @@ class MainGame(Scene):
         sprite_manager.add('explosion', 'assets/textures/spritesheets/explosion.png', True, (96, 96))
         sprite_manager.add('laser', 'assets/textures/spritesheets/laser.png', True,  (32, 32))
         sprite_manager.add('crosshair', 'assets/textures/sprites/crosshair.png')
+        sprite_manager.add('planet buster', 'assets/textures/sprites/planet_buster.png')
+        sprite_manager.add('exploding planet', 'assets/textures/spritesheets/exploding_planet.png', True, (96, 96))
 
         self.crosshair = CrossHair((0, 0), sprite_manager)
 
@@ -258,3 +280,30 @@ class MainGame(Scene):
                         Enemy((400, -1100), sprite_manager),
                         Enemy((450, -1100), sprite_manager),]
 
+    def draw_special_text(self, *args):
+        surf = args[0]
+        dt = args[1]
+        player = args[2]
+
+        # display position
+        surf.blit(render_text_with_shadow(2, f'POSITION: [{round(self.player.position.x / 10)}, {round(self.player.position.y / 10)}]'), (10, 10))
+        # display fps
+        if self.last_fps_update > self.fps_update_rate:
+            self.last_fps_value = round(1 / dt)
+        surf.blit(render_text_with_shadow(2, f'FPS: [{self.last_fps_value}]'), (10, 50))
+
+        # display planet buster status
+        if player.used_the_only_attempt:
+            surf.blit(render_text_with_shadow(2, '[PLANET BUSTER DEPLOYED]', colour=ORANGE, drop_colour=RED), (10, 90))
+        elif player.planet_buster_activated:
+            surf.blit(render_text_with_shadow(2, f'[PLANET BUSTER ACTIVATION IN:]', colour=YELLOW, drop_colour=ORANGE), (10, 90))
+            surf.blit(render_text_with_shadow(2, f'[{ceil(player.planet_buster_activation_time)} SECONDS]', colour=YELLOW, drop_colour=ORANGE), (10, 130))
+        else:
+            surf.blit(render_text_with_shadow(2, f'[PLANET BUSTER ONLINE]', colour=GREEN, drop_colour=DARK_GREEN), (10, 90))
+
+        # draw mission details
+        if self.end_of_mission:
+            if self.mission_failed:
+                surf.blit(render_text_with_shadow(2, f'[MISSION FAILED]', colour=RED, drop_colour=DARK_RED), (10, 130))
+            else:
+                surf.blit(render_text_with_shadow(2, f'[MISSION SUCCESSFUL]', colour=GREEN, drop_colour=DARK_GREEN), (10, 130))

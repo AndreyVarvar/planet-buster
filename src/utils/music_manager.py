@@ -5,7 +5,7 @@ class MusicManager:
     def __init__(self):
         self.current_music = None
         self.musics = {}
-        self.volume = 1
+        self.volume = 0
 
     def add(self, name, path):
         self.musics.update({name: path})

@@ -5,7 +5,7 @@ import pygame as pg
 
 
 class CelestialBody(Animation):
-    def __init__(self, position, type, i, sprite_manager, distance_from_center, revolution_angle, revolution_speed, scale=-1):
+    def __init__(self, position, type, i, sprite_manager, distance_from_center, revolution_angle, revolution_speed, scale=-1, target=False):
         paths = {
             "planet": ['assets/textures/spritesheets/planet1.png',
                        'assets/textures/spritesheets/planet2.png',
@@ -82,9 +82,13 @@ class CelestialBody(Animation):
 
         self.type = type
 
+        self.destroyed = False
+
         self.distance_from_center = distance_from_center
         self.revolution_angle = revolution_angle
         self.revolution_speed = revolution_speed
+
+        self.target = target
 
     def update(self, *args):
         dt = args[0]

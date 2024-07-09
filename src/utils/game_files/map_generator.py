@@ -23,4 +23,8 @@ def generate_map(sprite_manager, difficulty):
 
         planets.append(CelestialBody(planet_pos, planet_type, -1, sprite_manager, distance_from_center, degrees(random_rotation), rotation_speed, scale))  # the SUN
 
+
+    target = random.randint(0, planet_count-1) + 1  # add 1 to exclude the sun from being assigned as a target
+    planets[target].target = True
+
     return planets

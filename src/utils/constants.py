@@ -11,7 +11,11 @@ FPS = 1000
 BLACK = (13, 0, 26)
 YELLOW = (242, 236, 139)
 ORANGE = (251, 185, 84)
+DARK_ORANGE = (205, 104, 61)
 RED = (153, 61, 65)
+DARK_RED = (122, 48, 69)
+GREEN = (151, 147, 58)
+DARK_GREEN = (95, 109, 67)
 
 # scene names
 MAIN_MENU = 'main menu'

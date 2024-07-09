@@ -18,7 +18,11 @@ def render_text_with_shadow(offset, text, colour=(255, 255, 255), drop_colour=(1
 
 def calculate_shoot_angle(shooter, projectile_speed, target):
     v1 = projectile_speed
-    v2: pg.Vector2 = target.velocity
+
+    try:
+        v2: pg.Vector2 = target.velocity
+    except AttributeError:
+        v2 = pg.Vector2(0, 0)
 
     x1, y1 = shooter.position
     x2, y2 = target.position
