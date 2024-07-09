@@ -83,6 +83,8 @@ class CelestialBody(Animation):
         self.type = type
 
         self.destroyed = False
+        self.exploded = False
+        self.done_exploding = False
 
         self.distance_from_center = distance_from_center
         self.revolution_angle = revolution_angle
@@ -92,10 +94,18 @@ class CelestialBody(Animation):
 
     def update(self, *args):
         dt = args[0]
+        sprite_manager = args[1]
 
         self.revolution_angle += self.revolution_speed*dt
         self.position.x = self.distance_from_center*cos(radians(self.revolution_angle))
         self.position.y = self.distance_from_center*sin(radians(self.revolution_angle))
+
+        if self.destroyed and self.exploded is False:
+            super().__init__(self.position, 'planet exploding', sprite_manager, 2, self.radius/32)
+            self.exploded = True
+
+        if self.animation_end and self.exploded:
+            self.done_exploding = True
 
         super().update(dt)
 
@@ -104,7 +114,8 @@ class CelestialBody(Animation):
         scroll = args[1]
         time = args[2]
 
-        super().draw(surf, scroll, offset=(cos(time)*self.scale, sin(time)*self.scale))
+        if not (not self.exploded and self.animation_end):
+            super().draw(surf, scroll, offset=(cos(time)*self.scale, sin(time)*self.scale))
 
     def apply_gravity(self, other_object, dt):
         distance = sqrt((other_object.position.x-self.position.x)**2 + (other_object.position.y-self.position.y)**2)

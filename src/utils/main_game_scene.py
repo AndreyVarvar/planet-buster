@@ -72,6 +72,7 @@ class MainGame(Scene):
         cursor = args[1]
         dt = args[2]
         scroll = args[3]
+        sound_manager = args[5]
         background = args[6]
         sprite_manager = args[7]
 
@@ -94,7 +95,7 @@ class MainGame(Scene):
         self.update_projectiles(*args)
 
         # check if planet buster is called on
-        self.deploy_planet_buster(sprite_manager, dt)
+        self.deploy_planet_buster(sprite_manager, dt, sound_manager)
 
         # update the background according to the scroll
         background.position = -pg.Vector2(scroll)
@@ -102,6 +103,7 @@ class MainGame(Scene):
     def deploy_planet_buster(self, *args):
         sprite_manager = args[0]
         dt = args[1]
+        sound_manager = args[2]
 
         # make planet buster if called, otherwise just update
         if self.planet_buster is not None:
@@ -125,6 +127,7 @@ class MainGame(Scene):
                     self.planet_buster = None
                     planet.destroyed = True
                     self.end_of_mission = True
+                    sound_manager.play('planet explosion')
                     if not planet.target:
                         self.mission_failed = True
                     break
@@ -188,16 +191,20 @@ class MainGame(Scene):
 
     def update_planets(self, *args):
         dt = args[2]
+        sprite_manager = args[7]
 
         # update every planet
-        for planet in self.planets:
-            planet.update(dt)
+        for planet in self.planets.copy():
+            planet.update(dt, sprite_manager)
 
             # as well as apply gravity to the player
             planet.apply_gravity(self.player, dt)
             # and the enemies
             for enemy in self.enemies:
                 planet.apply_gravity(enemy, dt)
+
+            if planet.done_exploding:
+                self.planets.remove(planet)
 
     def update_projectiles(self, *args):
         dt = args[2]
@@ -260,12 +267,11 @@ class MainGame(Scene):
         sprite_manager.add('laser', 'assets/textures/spritesheets/laser.png', True,  (32, 32))
         sprite_manager.add('crosshair', 'assets/textures/sprites/crosshair.png')
         sprite_manager.add('planet buster', 'assets/textures/sprites/planet_buster.png')
-        sprite_manager.add('exploding planet', 'assets/textures/spritesheets/exploding_planet.png', True, (96, 96))
+        sprite_manager.add('planet exploding', 'assets/textures/spritesheets/exploding_planet.png', True, (96, 96))
 
         self.crosshair = CrossHair((0, 0), sprite_manager)
 
         self.planets = generate_map(sprite_manager, 1)
-
 
         self.player = Player((0, -1500), sprite_manager)
 

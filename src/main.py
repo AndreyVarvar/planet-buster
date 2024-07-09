@@ -30,6 +30,7 @@ class Game:
         self.sound_manager.add('ui-slider-slide', pg.mixer.Sound('assets/sfx/slider_slide.wav'))
         self.sound_manager.add('laser-fired', pg.mixer.Sound('assets/sfx/laser.wav'))
         self.sound_manager.add('hurt', pg.mixer.Sound('assets/sfx/hurt.wav'))
+        self.sound_manager.add('planet explosion', pg.mixer.Sound('assets/sfx/planet_explosing.wav'))
         self.sound_manager.add('whoosh', pg.mixer.Sound('assets/sfx/whoosh.wav'))
 
         self.sound_manager.set_volume(0.33)
