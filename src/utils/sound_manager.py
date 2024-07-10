@@ -33,6 +33,16 @@ class SoundManager:
         else:
             s.stop()
 
+    def stop_all(self):
+        for sound in self.sounds:
+            s = self.sounds[sound]
+
+            if isinstance(s, list):
+                for sfx in s:
+                    sfx.stop()
+            else:
+                s.stop()
+
     def set_volume(self, volume):
         self.volume = volume
         for name in self.sounds:

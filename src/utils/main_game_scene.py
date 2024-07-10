@@ -83,6 +83,15 @@ class MainGame(Scene):
 
         cursor.set_cursor(pg.SYSTEM_CURSOR_CROSSHAIR)
 
+        # obvious updates
+        self.update_radar(*args)
+        self.update_crosshair(*args)
+        self.update_player(*args)
+        self.update_enemies(*args)
+        self.update_projectiles(*args)
+        self.deploy_planet_buster(sprite_manager, dt, sound_manager)
+        self.update_planets(*args)
+
         # update the FPS meter
         while self.last_fps_update > self.fps_update_rate:
             self.last_fps_update -= self.fps_update_rate
@@ -94,6 +103,7 @@ class MainGame(Scene):
                 if self.mission_failed:
                     self.change_scene = True
                     self.change_to = MISSION_FAIL
+                    sound_manager.stop('thrust')
                 else:
                     self.change_scene = True
                     self.change_to = MISSION_SUCCESS
@@ -107,17 +117,6 @@ class MainGame(Scene):
 
         # update descriptor
         self.planet_description.position = pg.Vector2(scroll)
-
-        # obvious updates
-        self.update_radar(*args)
-        self.update_planets(*args)
-        self.update_crosshair(*args)
-        self.update_player(*args)
-        self.update_enemies(*args)
-        self.update_projectiles(*args)
-
-        # check if planet buster is called on
-        self.deploy_planet_buster(sprite_manager, dt, sound_manager)
 
         # update the background according to the scroll
         background.position = -pg.Vector2(scroll)

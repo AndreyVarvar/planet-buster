@@ -7,15 +7,10 @@ class PlanetBuster(Thingy):
         super().__init__(position, sprite_manager.sprites['planet buster'], drawing_angle_offset=-90, scale=1.5)
         self.target = None
         self.exploded = False
-        self.velocity = 0
-        self.acceleration = 200
-        self.max_velocity = 400
+        self.velocity = 200
 
     def update(self, dt):
 
-        self.velocity += self.acceleration*dt
-        self.velocity = min(self.velocity, self.max_velocity)
-
-        self.rotation = 180 + degrees(atan2(-self.position.y + self.target.position.y, self.position.x - self.target.position.x))
-        self.position.x += self.velocity * dt * cos(self.rotation)
-        self.position.y -= self.velocity * dt * sin(self.rotation)
+        self.rotation = degrees(atan2(-self.position.y + self.target.position.y, self.position.x - self.target.position.x)) + 180
+        self.position.x += self.velocity * dt * cos(radians(self.rotation))
+        self.position.y -= self.velocity * dt * sin(radians(self.rotation))

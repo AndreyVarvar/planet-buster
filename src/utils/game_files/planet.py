@@ -129,7 +129,7 @@ class CelestialBody(Animation):
         scroll = args[1]
         time = args[2]
 
-        if not (not self.exploded and self.animation_end):
+        if not (self.exploded and self.animation_end):
             super().draw(surf, scroll, offset=(cos(time)*self.scale, sin(time)*self.scale))
 
     def apply_gravity(self, other_object, dt):

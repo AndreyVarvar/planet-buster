@@ -36,7 +36,7 @@ class Player(Animation):
         self.fire_planet_buster = False
         self.used_the_only_attempt = False
         self.planet_buster_activated = False
-        self.planet_buster_activation_time = 20  # seconds
+        self.planet_buster_activation_time = 0  # seconds
 
     def update(self, *args):
         dt = args[0]
