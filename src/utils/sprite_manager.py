@@ -9,7 +9,7 @@ class SpriteManager:
         if animation:
             self.sprites.update({name: []})
             spritesheet = pg.image.load(path).convert_alpha()
-            for i in range(spritesheet.width//frame_dimensions[0]):
+            for i in range(spritesheet.get_width()//frame_dimensions[0]):
                 self.sprites[name].append(spritesheet.subsurface(pg.Rect(frame_dimensions[0]*i, 0, frame_dimensions[0], frame_dimensions[1])))
         else:
             image = pg.image.load(path).convert_alpha()

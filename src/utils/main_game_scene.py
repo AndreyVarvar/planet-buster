@@ -28,6 +28,8 @@ class MainGame(Scene):
         self.mission_failed = False
         self.end_of_mission = False
 
+        self.detonated_planet = None
+
         self.fps_update_rate = 1  # every second
         self.last_fps_update = 0
         self.last_fps_value = 100
@@ -86,15 +88,19 @@ class MainGame(Scene):
             self.last_fps_update -= self.fps_update_rate
         self.last_fps_update += dt
 
-        # check current state
-        for planet in self.planets:
-            if planet.target:
-                target = planet
-                break
 
-        if target.exploded and target.animation_end and not self.mission_failed:
+        if self.end_of_mission:
+            if self.detonated_planet.animation_end:
+                if self.mission_failed:
+                    self.change_scene = True
+                    self.change_to = MISSION_FAIL
+                else:
+                    self.change_scene = True
+                    self.change_to = MISSION_SUCCESS
+
+        if self.player.really_dead:
             self.change_scene = True
-            self.change_to = MAIN_MENU
+            self.change_to = MISSION_FAIL
 
         # update the time, which is used to make some object move by using sin and cos
         self.time += dt
@@ -135,9 +141,13 @@ class MainGame(Scene):
                 if dist(self.planet_buster.position, planet.position) < dist(self.planet_buster.position, closest_planet.position):
                     closest_planet = planet
 
-            self.planet_buster.target = closest_planet
+            if self.crosshair.locked_on == 'planet':
+                self.planet_buster.target = self.player.target
+            else:
+                self.planet_buster.target = closest_planet
 
         # check any collisions
+
         if self.planet_buster is not None:
             for planet in self.planets:
                 if dist(self.planet_buster.position, planet.position) <= (planet.radius+10):
@@ -145,6 +155,7 @@ class MainGame(Scene):
                     self.planet_buster = None
                     planet.destroyed = True
                     self.end_of_mission = True
+                    self.detonated_planet = planet
                     sound_manager.play('planet explosion')
                     if not planet.target:
                         self.mission_failed = True
@@ -201,11 +212,6 @@ class MainGame(Scene):
                 projectile_rotation = degrees(atan2(self.player.position.y - mouse_pos[1] - scroll[1] + HEIGHT // 2, -self.player.position.x + mouse_pos[0] + scroll[0] - WIDTH // 2))
 
             self.projectiles.append(Projectile(self.player.position, 0, 1000, projectile_rotation, sound_manager, sprite_manager))
-
-        # end game when player dies
-        if self.player.really_dead:
-            self.change_scene = True
-            self.change_to = MAIN_MENU
 
     def update_planets(self, *args):
         dt = args[2]
@@ -327,12 +333,21 @@ class MainGame(Scene):
             surf.blit(render_text_with_shadow(2, f'[PLANET BUSTER ONLINE]', colour=GREEN, drop_colour=DARK_GREEN), (10, 90))
 
         # draw mission details
-        if self.end_of_mission:
-            if self.mission_failed:
-                surf.blit(render_text_with_shadow(2, f'[MISSION FAILED]', colour=RED, drop_colour=DARK_RED), (10, 130))
+        if self.end_of_mission or self.player.dead:
+            if self.mission_failed or self.player.dead:
+                surf.blit(render_text_with_shadow(2, f'[MISSION FAILED]', colour=RED, drop_colour=DARK_RED), (10, 170))
             else:
-                surf.blit(render_text_with_shadow(2, f'[MISSION SUCCESSFUL]', colour=GREEN, drop_colour=DARK_GREEN), (10, 130))
+                surf.blit(render_text_with_shadow(2, f'[MISSION SUCCESSFUL]', colour=GREEN, drop_colour=DARK_GREEN), (10, 170))
+        else:
+            surf.blit(render_text_with_shadow(2, f'[MISSION IN PROGRESS]', colour=ORANGE, drop_colour=RED), (10, 170))
 
         # draw text related to target planet descriptor
         surf.blit(render_text_with_shadow(2, f'[TARGET:]'), (750, 500))
-        surf.blit(render_text_with_shadow(2, f'[PLANET: {self.planet_description.planet_number}]'), (730, 750))
+
+        if not self.player.planet_buster_activated:
+            if dist(self.player.position, self.planet_description.target.position) < 500:
+                surf.blit(render_text_with_shadow(2, f'[TARGET CLOSE]', colour=GREEN, drop_colour=DARK_GREEN), (680, 750))
+            elif dist(self.player.position, self.planet_description.target.position) < 1500:
+                surf.blit(render_text_with_shadow(2, f'[TARGET NEAR]', colour=ORANGE, drop_colour=DARK_ORANGE), (690, 750))
+            else:
+                surf.blit(render_text_with_shadow(2, f'[TARGET FAR]', colour=RED, drop_colour=DARK_RED), (700, 750))

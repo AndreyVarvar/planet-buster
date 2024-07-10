@@ -35,21 +35,21 @@ class Slider(Thingy):
 
         self.slider_texture_parts = load_slider_spritesheet()
         # scale each part appropriately
-        scale_factor = rail_size[1]/self.slider_texture_parts['br'].size[1]
+        scale_factor = rail_size[1]/self.slider_texture_parts['br'].get_size()[1]
 
         for part in ['br', 'dr', 'br_start', 'dr_end']:
             img = self.slider_texture_parts[part]
             self.slider_texture_parts[part] = pg.transform.scale_by(img, scale_factor)
 
         knob = self.slider_texture_parts['knob']
-        self.slider_texture_parts['knob'] = pg.transform.scale_by(knob, knob_size[1] / knob.size[1])
+        self.slider_texture_parts['knob'] = pg.transform.scale_by(knob, knob_size[1] / knob.get_size()[1])
 
 
         self.positional_step = self.rail.width / (self.range / self.step)
 
         self.knob_pos = pg.Vector2(self.rail.x + self.rail.width*(initial_value/self.range), self.rail.centery)
 
-        self.knob_size = self.slider_texture_parts['knob'].size
+        self.knob_size = self.slider_texture_parts['knob'].get_size()
 
         self.value = initial_value
 
@@ -87,10 +87,10 @@ class Slider(Thingy):
 
         duration = round(self.knob_pos.x - self.rail.x)
 
-        for i in range(bright_start.size[0], duration):
+        for i in range(bright_start.get_size()[0], duration):
             surf.blit(bright, (self.rail.x+i, self.position.y-self.rail.height//2))
 
-        surf.blit(bright_start, (self.rail.x, bright_start.size[0]+self.position.y - self.rail.height // 2))
+        surf.blit(bright_start, (self.rail.x, bright_start.get_size()[0]+self.position.y - self.rail.height // 2))
 
         # step 2: draw the dark side
         dark = self.slider_texture_parts['dr']
@@ -101,7 +101,7 @@ class Slider(Thingy):
         for i in range(duration):
             surf.blit(dark, (self.rail.x+self.rail.width-i, self.position.y-self.rail.height//2))
 
-        surf.blit(dark_end, (self.rail.x+self.rail.width+dark_end.size[0], dark_end.size[0] + self.position.y - self.rail.height // 2))
+        surf.blit(dark_end, (self.rail.x+self.rail.width+dark_end.get_size()[0], dark_end.get_size()[0] + self.position.y - self.rail.height // 2))
 
         # step 3: draw the knob
         knob = self.slider_texture_parts['knob']

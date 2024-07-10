@@ -30,6 +30,6 @@ def generate_map(sprite_manager, difficulty):
 
 
 
-    planet_description = Descriptor((0, 0), sprite_manager, planets[target].texture, target)
+    planet_description = Descriptor((0, 0), sprite_manager, planets[target])
 
     return planets, planet_description

@@ -5,6 +5,7 @@ from src.UI.button import Button
 from src.UI.slider import Slider
 
 from src.utils.thingy import Thingy
+from src.utils.utilities import *
 
 from math import cos, sin
 
@@ -128,4 +129,100 @@ class Settings(Scene):
 
         self.slider1 = Slider((500, 300), (400, 30), (50, 50), 0, 1, sound_manager.volume, 0.05, 'sfx volume', desc_with_shadow=True, shadow_color=RED)
         self.slider2 = Slider((500, 450), (400, 30), (50, 50), 0, 1, music_manager.volume, 0.1, 'music volume', desc_with_shadow=True, shadow_color=RED)
+
+class MissionFail(Scene):
+    def __init__(self, *args):
+        super().__init__(MISSION_FAIL, *args)
+
+    def draw_scene(self, *args):
+        surf = args[0]
+
+        self.button1.draw(surf)
+        self.button2.draw(surf)
+
+        surf.blit(render_text_with_shadow(2, '[MISSION FAILED]', RED, DARK_ORANGE, large_font), (225, 100))
+
+    def update(self, *args):
+        mouse_pos = args[0]
+        cursor = args[1]
+        dt = args[2]
+        sound_manager = args[5]
+        background = args[6]
+        music_manager = args[8]
+
+        music_manager.play('try_again')
+
+        background.position = pg.Vector2(background.position.x, background.position.y + 200 * dt)
+
+        self.button1.update(mouse_pos, cursor, sound_manager)
+        self.button2.update(mouse_pos, cursor, sound_manager)
+
+        if self.button1.pressed:
+            self.change_scene = True
+            self.change_to = MAIN_MENU
+
+        elif self.button2.pressed:
+            self.change_scene = True
+            self.change_to = MAIN_GAME
+
+    def scene_thingies_init(self, *args):
+        sprite_manager = args[0]
+
+        sprite_manager.add('button outline', 'assets/textures/UI/button_outline.png')
+        sprite_manager.add('button outline on hover', 'assets/textures/UI/button_outline_hover.png')
+
+        button_outline = sprite_manager.sprites['button outline']
+        button_outline_hovered = sprite_manager.sprites['button outline on hover']
+
+        self.button1 = Button((500, 300), (400, 80), text='to main menu', font=default_font, texture=button_outline, hover_texture=button_outline_hovered, text_color=ORANGE, text_with_shadow=True, shadow_color=RED)
+        self.button2 = Button((500, 400), (400, 80), text='try again', font=default_font, texture=button_outline, hover_texture=button_outline_hovered, text_color=ORANGE, text_with_shadow=True, shadow_color=RED)
+
+
+class MissionSuccess(Scene):
+    def __init__(self, *args):
+        super().__init__(MISSION_FAIL, *args)
+
+    def draw_scene(self, *args):
+        surf = args[0]
+
+        self.button1.draw(surf)
+        self.button2.draw(surf)
+
+        surf.blit(render_text_with_shadow(2, '[MISSION SUCCESSFUL]', GREEN, DARK_GREEN, large_font), (150, 100))
+
+    def update(self, *args):
+        mouse_pos = args[0]
+        cursor = args[1]
+        dt = args[2]
+        sound_manager = args[5]
+        background = args[6]
+        music_manager = args[8]
+
+        music_manager.play('try_again')
+
+        background.position = pg.Vector2(background.position.x, background.position.y + 200 * dt)
+
+        self.button1.update(mouse_pos, cursor, sound_manager)
+        self.button2.update(mouse_pos, cursor, sound_manager)
+
+        if self.button1.pressed:
+            self.change_scene = True
+            self.change_to = MAIN_MENU
+
+        elif self.button2.pressed:
+            self.change_scene = True
+            self.change_to = MAIN_GAME
+
+    def scene_thingies_init(self, *args):
+        sprite_manager = args[0]
+
+        sprite_manager.add('button outline', 'assets/textures/UI/button_outline.png')
+        sprite_manager.add('button outline on hover', 'assets/textures/UI/button_outline_hover.png')
+
+        button_outline = sprite_manager.sprites['button outline']
+        button_outline_hovered = sprite_manager.sprites['button outline on hover']
+
+        self.button1 = Button((500, 300), (400, 80), text='to main menu', font=default_font, texture=button_outline, hover_texture=button_outline_hovered, text_color=ORANGE, text_with_shadow=True, shadow_color=RED)
+        self.button2 = Button((500, 400), (400, 80), text='next mission', font=default_font, texture=button_outline, hover_texture=button_outline_hovered, text_color=ORANGE, text_with_shadow=True, shadow_color=RED)
+
 

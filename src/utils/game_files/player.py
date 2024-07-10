@@ -36,7 +36,7 @@ class Player(Animation):
         self.fire_planet_buster = False
         self.used_the_only_attempt = False
         self.planet_buster_activated = False
-        self.planet_buster_activation_time = 0  # seconds
+        self.planet_buster_activation_time = 20  # seconds
 
     def update(self, *args):
         dt = args[0]
@@ -60,11 +60,12 @@ class Player(Animation):
                 self.dead = True
 
             self.update_position_and_velocity(dt, keys_pressed)
-            self.update_scroll(scroll, mouse_pos)
             self.spawn_lasers(dt, cursor)
 
             self.dont_go_out_of_bounds(map_boundaries)
             self.dont_make_scroll_go_out_of_bounds(scroll, map_boundaries)
+
+            self.update_scroll(scroll, mouse_pos)
 
             self.PLANET_BUSTER(keys_pressed, crosshair, dt)
         else:
@@ -77,7 +78,7 @@ class Player(Animation):
 
                 self.exploded = True
                 self.rotation = 90
-                super().__init__(self.position, 'explosion', sprite_manager, 5, scale=2)
+                super().__init__(self.position, 'explosion', sprite_manager, 3, scale=2)
 
             scroll[0] += (-scroll[0]+self.position.x)/20
             scroll[1] += (-scroll[1]+self.position.y)/20

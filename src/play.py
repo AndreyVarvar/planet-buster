@@ -9,12 +9,13 @@ from src.utils.scene_manager import SceneManager  # crazy namings
 from src.utils.sprite_manager import SpriteManager
 
 # scenes
-from src.utils.scenes import MainMenu, Settings
+from src.utils.scenes import *
 from src.utils.main_game_scene import MainGame
 
 from src.utils.background_sky import BackGroundSky
 
 import src.utils.scenes, src.utils.main_game_scene  # aren't supposed to be used in here, but need to be 'called'
+import asyncio
 
 
 class Game:
@@ -52,6 +53,8 @@ class Game:
         self.scene_manager.add_scene(MAIN_MENU, MainMenu)
         self.scene_manager.add_scene(SETTINGS, Settings)
         self.scene_manager.add_scene(MAIN_GAME, MainGame)
+        self.scene_manager.add_scene(MISSION_FAIL, MissionFail)
+        self.scene_manager.add_scene(MISSION_SUCCESS, MissionSuccess)
 
         self.scene_manager.current_scene = self.scene_manager.scenes[MAIN_MENU](self.sprite_manager)
 
@@ -68,11 +71,13 @@ class Game:
 
         self.dt = 0
 
-    def run(self):
+    async def run(self):
         while self.running:
             self.dt = self.clock.tick(FPS)/1000
 
             events = pg.event.get()
+
+            await asyncio.sleep(0)
 
             self.event_handling(events)  # handle events bruh
             self.update()
