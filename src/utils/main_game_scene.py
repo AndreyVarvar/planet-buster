@@ -23,14 +23,14 @@ class MainGame(Scene):
 
         self.time = 0
 
-        self.projectiles = []
+        self.projectiles = set()
 
         self.mission_failed = False
         self.end_of_mission = False
 
         self.detonated_planet = None
 
-        self.fps_update_rate = 1  # every second
+        self.fps_update_rate = 0.5  # every second
         self.last_fps_update = 0
         self.last_fps_value = 100
         self.radar = Radar(self.player.position, sprite_manager)
@@ -135,10 +135,13 @@ class MainGame(Scene):
             sound_manager.play('thrust', loop=-1)
 
             # get the target
-            closest_planet = self.planets[1]
-            for planet in self.planets[1:]:
-                if dist(self.planet_buster.position, planet.position) < dist(self.planet_buster.position, closest_planet.position):
+            closest_planet = None
+            for planet in self.planets:
+                if closest_planet is None:
                     closest_planet = planet
+                elif planet.type not in ['sun', 'black hole']:
+                    if dist(self.planet_buster.position, planet.position) < dist(self.planet_buster.position, closest_planet.position):
+                        closest_planet = planet
 
             if self.crosshair.locked_on == 'planet':
                 self.planet_buster.target = self.player.target
@@ -187,7 +190,7 @@ class MainGame(Scene):
 
             if enemy.spawn_laser and enemy.dead is False:  # spawn lasers
                 projectile_angle = calculate_shoot_angle(enemy, 1000, self.player) + random.randint(-10, 10)
-                self.projectiles.append(Projectile(enemy.position, 2, 1000, projectile_angle, sound_manager, sprite_manager))
+                self.projectiles.add(Projectile(enemy.position, 2, 1000, projectile_angle, sound_manager, sprite_manager))
 
             if enemy.really_dead_and_should_be_destroyed:
                 self.enemies.remove(enemy)
@@ -210,7 +213,7 @@ class MainGame(Scene):
             else:
                 projectile_rotation = degrees(atan2(self.player.position.y - mouse_pos[1] - scroll[1] + HEIGHT // 2, -self.player.position.x + mouse_pos[0] + scroll[0] - WIDTH // 2))
 
-            self.projectiles.append(Projectile(self.player.position, 0, 1000, projectile_rotation, sound_manager, sprite_manager))
+            self.projectiles.add(Projectile(self.player.position, 0, 1000, projectile_rotation, sound_manager, sprite_manager))
 
     def update_planets(self, *args):
         dt = args[2]
@@ -218,16 +221,17 @@ class MainGame(Scene):
 
         # update every planet
         for planet in self.planets.copy():
-            planet.update(dt, sprite_manager)
+            if dist(planet.position, self.player.position) < 20_000:
+                planet.update(dt, sprite_manager)
 
-            # as well as apply gravity to the player
-            planet.apply_gravity(self.player, dt)
-            # and the enemies
-            for enemy in self.enemies:
-                planet.apply_gravity(enemy, dt)
+                # as well as apply gravity to the player
+                planet.apply_gravity(self.player, dt)
+                # and the enemies
+                for enemy in self.enemies:
+                    planet.apply_gravity(enemy, dt)
 
-            if planet.done_exploding:
-                self.planets.remove(planet)
+                if planet.done_exploding:
+                    self.planets.remove(planet)
 
     def update_projectiles(self, *args):
         dt = args[2]
@@ -235,7 +239,7 @@ class MainGame(Scene):
         sound_manager = args[5]
 
         # update projectiles
-        for projectile in self.projectiles:
+        for projectile in self.projectiles.copy():
             projectile_dead = False
 
             projectile.update(dt)
@@ -286,6 +290,7 @@ class MainGame(Scene):
 
         sprite_manager.add('player', 'assets/textures/spritesheets/spaceship.png', True, (32, 32))
         sprite_manager.add('enemy', 'assets/textures/spritesheets/enemy-spaceship.png', True, (32, 32))
+
         sprite_manager.add('explosion', 'assets/textures/spritesheets/explosion.png', True, (96, 96))
         sprite_manager.add('laser', 'assets/textures/spritesheets/laser.png', True,  (32, 32))
         sprite_manager.add('crosshair', 'assets/textures/sprites/crosshair.png')
@@ -299,7 +304,7 @@ class MainGame(Scene):
 
         self.player = Player((0, -1500), sprite_manager)
 
-        self.enemies = [Enemy((0, -1100), sprite_manager),
+        self.enemies = {Enemy((0, -1100), sprite_manager),
                         Enemy((50, -1100), sprite_manager),
                         Enemy((100, -1100), sprite_manager),
                         Enemy((150, -1100), sprite_manager),
@@ -308,7 +313,7 @@ class MainGame(Scene):
                         Enemy((300, -1100), sprite_manager),
                         Enemy((350, -1100), sprite_manager),
                         Enemy((400, -1100), sprite_manager),
-                        Enemy((450, -1100), sprite_manager),]
+                        Enemy((450, -1100), sprite_manager)}
 
     def draw_special_text(self, *args):
         surf = args[0]

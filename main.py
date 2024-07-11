@@ -11,3 +11,6 @@ from src.play import Game
 
 game = Game(display)  # 1000 by 600 is the display size
 asyncio.run(game.run())
+
+pg.quit()
+quit()

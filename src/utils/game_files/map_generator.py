@@ -5,14 +5,17 @@ import random
 
 
 def generate_map(sprite_manager, difficulty):
-    planets = []
+    planets = set()
     if difficulty < 8:
-        planets.append(CelestialBody((0, 0), 'sun', difficulty % 4, sprite_manager, 0, 0, 0))  # the SUN
+        planets.add(CelestialBody((0, 0), 'sun', difficulty % 4, sprite_manager, 0, 0, 0))  # the SUN
     else:
-        planets.append(CelestialBody((0, 0), 'black hole', -1, sprite_manager, 0, 0, 0))  # the SUN
+        planets.add(CelestialBody((0, 0), 'black hole', -1, sprite_manager, 0, 0, 0))  # the SUN
 
     # depending on difficulty add more planets
     planet_count = 10
+    target = random.randint(0, planet_count - 1)
+    planet_description = None
+
     for i in range(planet_count):
         random_rotation = radians(random.randint(0, 360))
         distance_from_center = (i+1)*(10_000/(planet_count+1))
@@ -22,14 +25,12 @@ def generate_map(sprite_manager, difficulty):
 
         planet_type = random.choice(['planet', 'gas giant'])
 
-        planets.append(CelestialBody(planet_pos, planet_type, -1, sprite_manager, distance_from_center, degrees(random_rotation), rotation_speed, scale))  # the SUN
+        planet = CelestialBody(planet_pos, planet_type, -1, sprite_manager, distance_from_center, degrees(random_rotation), rotation_speed, scale)
 
+        if i == target:
+            planet.target = True
+            planet_description = Descriptor((0, 0), sprite_manager, planet)
 
-    target = random.randint(0, planet_count-1) + 1  # add 1 to exclude the sun from being assigned as a target
-    planets[target].target = True
-
-
-
-    planet_description = Descriptor((0, 0), sprite_manager, planets[target])
+        planets.add(planet)  # the SUN
 
     return planets, planet_description

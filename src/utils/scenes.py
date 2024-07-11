@@ -130,6 +130,7 @@ class Settings(Scene):
         self.slider1 = Slider((500, 300), (400, 30), (50, 50), 0, 1, sound_manager.volume, 0.05, 'sfx volume', desc_with_shadow=True, shadow_color=RED)
         self.slider2 = Slider((500, 450), (400, 30), (50, 50), 0, 1, music_manager.volume, 0.1, 'music volume', desc_with_shadow=True, shadow_color=RED)
 
+
 class MissionFail(Scene):
     def __init__(self, *args):
         super().__init__(MISSION_FAIL, *args)

@@ -16,16 +16,21 @@ class CrossHair(Thingy):
         # find the closest enemy
         closest_enemy = None
         if len(enemies) > 0:
-            closest_enemy = enemies[0]
             for enemy in enemies:
-                if dist(mouse_pos_in_world, enemy.position) < dist(mouse_pos_in_world, closest_enemy.position) and enemy.dead is False:
+                if closest_enemy is None:
                     closest_enemy = enemy
+                else:
+                    if dist(mouse_pos_in_world, enemy.position) < dist(mouse_pos_in_world, closest_enemy.position) and enemy.dead is False:
+                        closest_enemy = enemy
 
         # find the closest planet
-        closest_planet = planets[1]
-        for planet in planets[1:]:
-            if dist(mouse_pos_in_world, planet.position) < dist(mouse_pos_in_world, closest_planet.position):
+        closest_planet = None
+        for planet in planets:
+            if closest_planet is None:
                 closest_planet = planet
+            elif planet.type not in ['sun', 'black hole']:
+                if dist(mouse_pos_in_world, planet.position) < dist(mouse_pos_in_world, closest_planet.position):
+                    closest_planet = planet
 
         # choose to aim for the planet or the enemy
         if closest_enemy is not None and dist(mouse_pos_in_world, closest_enemy.position) < 100 and player.dead is False:
