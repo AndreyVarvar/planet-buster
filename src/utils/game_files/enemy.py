@@ -15,8 +15,8 @@ class Enemy(Animation):
         self.health_bar = HealthBar(self.position + pg.Vector2(0, 20), sprite_manager)
 
         self.velocity = pg.Vector2()
-        self.acceleration = 500
-        self.max_speed = 750
+        self.acceleration = 1000
+        self.max_speed = 800
 
         self.dead = False
         self.playing_animation = False

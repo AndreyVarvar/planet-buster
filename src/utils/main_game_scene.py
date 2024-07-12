@@ -8,6 +8,7 @@ from src.utils.game_files.crosshair import CrossHair
 from src.utils.game_files.radar import Radar
 from src.utils.game_files.map_generator import generate_map
 from src.utils.game_files.planet_buster import PlanetBuster
+from src.utils.game_files.enemy_spawn_manager import EnemySpawnManager
 import random
 # here lies the massive scene that is out game
 
@@ -15,6 +16,8 @@ import random
 class MainGame(Scene):
     def __init__(self, *args):
         sprite_manager = args[0]
+        self.difficulty = args[3]
+
         super().__init__(MAIN_GAME, *args)
 
         self.map_boundaries = pg.Rect(-10_000, -10_000, 20_000, 20_000)
@@ -29,6 +32,8 @@ class MainGame(Scene):
         self.end_of_mission = False
 
         self.detonated_planet = None
+
+        self.enemy_spawn_manager = EnemySpawnManager(self.difficulty)
 
         self.fps_update_rate = 0.5  # every second
         self.last_fps_update = 0
@@ -92,11 +97,12 @@ class MainGame(Scene):
         self.deploy_planet_buster(sprite_manager, dt, sound_manager)
         self.update_planets(*args)
 
+        self.enemies.update(self.enemy_spawn_manager.update(dt, scroll, sprite_manager))
+
         # update the FPS meter
         while self.last_fps_update > self.fps_update_rate:
             self.last_fps_update -= self.fps_update_rate
         self.last_fps_update += dt
-
 
         if self.end_of_mission:
             if self.detonated_planet.animation_end:
@@ -300,20 +306,11 @@ class MainGame(Scene):
 
         self.crosshair = CrossHair((0, 0), sprite_manager)
 
-        self.planets, self.planet_description = generate_map(sprite_manager, 1)
+        self.planets, self.planet_description = generate_map(sprite_manager, self.difficulty)
 
         self.player = Player((0, -1500), sprite_manager)
 
-        self.enemies = {Enemy((0, -1100), sprite_manager),
-                        Enemy((50, -1100), sprite_manager),
-                        Enemy((100, -1100), sprite_manager),
-                        Enemy((150, -1100), sprite_manager),
-                        Enemy((200, -1100), sprite_manager),
-                        Enemy((250, -1100), sprite_manager),
-                        Enemy((300, -1100), sprite_manager),
-                        Enemy((350, -1100), sprite_manager),
-                        Enemy((400, -1100), sprite_manager),
-                        Enemy((450, -1100), sprite_manager)}
+        self.enemies = set()
 
     def draw_special_text(self, *args):
         surf = args[0]
@@ -348,7 +345,7 @@ class MainGame(Scene):
         # draw text related to target planet descriptor
         surf.blit(render_text_with_shadow(2, f'[TARGET:]'), (750, 500))
 
-        if not self.player.planet_buster_activated:
+        if not self.end_of_mission:
             if dist(self.player.position, self.planet_description.target.position) < 500:
                 surf.blit(render_text_with_shadow(2, f'[TARGET CLOSE]', colour=GREEN, drop_colour=DARK_GREEN), (680, 750))
             elif dist(self.player.position, self.planet_description.target.position) < 1500:

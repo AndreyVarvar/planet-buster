@@ -61,6 +61,8 @@ class Game:
 
         self.scene_manager.current_scene = self.scene_manager.scenes[MAIN_MENU](self.sprite_manager)
 
+        pg.display.set_caption('planet buster')
+
 
         self.background = BackGroundSky(self.sprite_manager)
 
@@ -69,6 +71,7 @@ class Game:
         self.clock = pg.time.Clock()
 
         self.difficulty = 0
+        self.raised_difficulty = False
 
         self.cursor = Cursor()
 
@@ -82,8 +85,6 @@ class Game:
             events = pg.event.get()
 
             await asyncio.sleep(0)
-
-            pg.display.set_caption(str(1/(self.dt+0.0000001)))
 
             self.event_handling(events)  # handle events bruh
             self.update()
@@ -108,9 +109,16 @@ class Game:
         pg.display.update()
 
     def update(self):
-        self.scene_manager.update(pg.mouse.get_pos(), self.cursor, self.dt, self.scroll, pg.key.get_pressed(), self.sound_manager, self.background, self.sprite_manager, self.music_manager)
+        self.scene_manager.update(pg.mouse.get_pos(), self.cursor, self.dt, self.scroll, pg.key.get_pressed(), self.sound_manager, self.background, self.sprite_manager, self.music_manager, self.difficulty)
 
         self.cursor.update(pg.mouse.get_pressed())
+
+        if self.scene_manager.current_scene.name == MISSION_SUCCESS:
+            if self.raised_difficulty is False:
+                self.raised_difficulty = True
+                self.difficulty += 1
+        else:
+            self.raised_difficulty = False
 
         if self.scene_manager.leaving:
             self.running = False
