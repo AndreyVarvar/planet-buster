@@ -1,6 +1,7 @@
 import asyncio
 
 import pygame as pg
+pg.mixer.pre_init()
 pg.init()
 
 from src.utils.constants import WIDTH, HEIGHT

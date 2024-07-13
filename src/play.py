@@ -1,5 +1,3 @@
-from src.utils.constants import *
-
 from src.utils.cursor import Cursor
 
 # managers
@@ -16,9 +14,6 @@ from src.utils.background_sky import BackGroundSky
 
 import src.utils.scenes, src.utils.main_game_scene  # aren't supposed to be used in here, but need to be 'called'
 import asyncio
-
-fps_history = []
-
 
 class Game:
     def __init__(self, display):
@@ -44,6 +39,7 @@ class Game:
         self.music_manager = MusicManager()
         self.music_manager.add('intro', 'assets/music/intro.ogg')
         self.music_manager.add('try_again', 'assets/music/try_again.wav')
+        self.music_manager.add('main_game', 'assets/music/main_game.wav')
 
         # setting up sprite manager
         self.sprite_manager = SpriteManager()
@@ -80,7 +76,6 @@ class Game:
     async def run(self):
         while self.running:
             self.dt = self.clock.tick(FPS)/1000
-            fps_history.append(round(1/(self.dt+0.000001)))
 
             events = pg.event.get()
 
@@ -89,10 +84,6 @@ class Game:
             self.event_handling(events)  # handle events bruh
             self.update()
             self.draw()
-
-        for i in range(len(fps_history)):
-            fps_history[i] = (i, fps_history[i])
-        print(fps_history)
 
     def event_handling(self, events):
         for event in events:

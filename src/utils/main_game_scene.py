@@ -85,6 +85,9 @@ class MainGame(Scene):
         sound_manager = args[5]
         background = args[6]
         sprite_manager = args[7]
+        music_manager = args[8]
+
+        music_manager.play('main_game')
 
         cursor.set_cursor(pg.SYSTEM_CURSOR_CROSSHAIR)
 
